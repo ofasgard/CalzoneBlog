@@ -1,1 +1,1 @@
-- [Dumping Lsass with... Frida? (Part 1)](/blog/mimikatz-frida-part-1) **(21/10/2022)**
+- [Dumping Lsass with... Frida? (Part 1)](/blogs/mimikatz-frida-part-1) **(21/10/2022)**
