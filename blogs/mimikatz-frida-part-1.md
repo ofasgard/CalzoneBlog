@@ -46,7 +46,7 @@ If we're looking to hook into the authentication logic called by Lsass, this see
 
 ## Step 2: Hooking MSV1_0
 
-So, now we have a good idea of which module we want to target, but how do we know which functions to hook in order to extract credentials? This is where frida-trace comes to the rescue. We can simply specify the module we're interested in and hook all functions within it:
+So, now we have a good idea of which module we want to target, but how do we know which functions to hook in order to extract credentials? This is where *frida-trace* comes to the rescue. Instead of writing dozens of boilerplate scripts to inject into each possible function, we can simply specify the module we're interested in and hook all functions within it:
 
 ```bash
 frida-trace -H 192.168.1.120 lsass.exe -i 'msv1_0.DLL!*'
