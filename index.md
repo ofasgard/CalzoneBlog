@@ -1,2 +1,1 @@
-- [Vulnerable VM Writeups: TrollCave](/blogs/vuln-vm-trollcave) **(14/04/2018)**
 - [Dumping Lsass with... Frida? (Part 1)](/blogs/mimikatz-frida-part-1) **(21/10/2022)**
