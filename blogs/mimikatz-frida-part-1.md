@@ -24,7 +24,7 @@ To start with, I spun up a Windows 10 VM and launched the latest version of Frid
 This opens a debugging server on port 27042, which we can connect to using Frida:
 
 ```bash
-$ frida-H 192.168.1.120 lsass.exe
+$ frida -H 192.168.1.120 lsass.exe
 ```
 
 One of Frida's most powerful features is its dynamic instrumentation functionality, which lets us hook almost any function used by a process. Before we can do that, though, we need some situational awareness. There are a lot of different modules loaded by the `lsass.exe` process, which we can enumerate using `Process.enumerateModules()`:
@@ -44,8 +44,19 @@ Out of the many possible options, this one stands out - it's the Microsoft Authe
 
 If we're looking to hook into the authentication logic called by Lsass, this seems like a pretty good place to start.
 
+## Step 2: Hooking MSV1_0
 
+So, now we have a good idea of a target, but how do we know which functions to hook in order to extract credentials? This is where frida-trace comes to the rescue. We can simply specify the module we're interested in and hook all functions within it:
 
+```bash
+frida-trace -H 192.168.1.120 lsass.exe -i 'msv1_0.DLL!*'
+```
+
+We leave this running while we invoke an interactive logon somewhere on the target VM (i.e. using the `runas` commad), and sure enough:
+
+![a screenshot of various hooked functions including LsaApLogonUserEx2](/img/tracing-msv1_0.png)
+
+I decided to go with the obvious choice here, and target the `LsaApLogonUserEx2()` function. Luckily for us, this function is actually [documented in the MSDN](https://docs.microsoft.com/en-us/windows/win32/api/ntsecpkg/nc-ntsecpkg-lsa_ap_logon_user_ex2). That will make hooking it a lot easier, as we know exactly what the arguments and return values are.
 
 
 <!--
