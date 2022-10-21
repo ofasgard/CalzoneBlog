@@ -56,7 +56,7 @@ We leave this running while we invoke an interactive logon somewhere on the targ
 
 ![a screenshot of various hooked functions including LsaApLogonUserEx2](/img/tracing-msv1_0.png)
 
-
+I decided to go with the obvious choice here, and target the `LsaApLogonUserEx2()` function. Luckily for us, this function is actually [documented in the MSDN](https://docs.microsoft.com/en-us/windows/win32/api/ntsecpkg/nc-ntsecpkg-lsa_ap_logon_user_ex2). That will make hooking it a lot easier, as we know exactly what the arguments and return values are.
 
 
 <!--
