@@ -27,7 +27,7 @@ This opens a debugging server on port 27042, which we can connect to using Frida
 $ frida -H 192.168.1.120 lsass.exe
 ```
 
-One of Frida's most powerful features is its dynamic instrumentation functionality, which lets us hook almost any function used by a process. Before we can do that, though, we need some situational awareness. There are a lot of different modules loaded by the *lsass.exe* process, which we can enumerate using `Process.enumerateModules()`:
+One of Frida's most powerful features is its dynamic instrumentation functionality, which lets us hook almost any function used by a process. Before we can do that, though, we'll need some basic situational awareness. There are a lot of different modules loaded by the *lsass.exe* process, which we can enumerate using `Process.enumerateModules()`. Here's just one of the results:
 
 ```text
     {
@@ -46,7 +46,7 @@ If we're looking to hook into the authentication logic called by Lsass, this see
 
 ## Step 2: Hooking MSV1_0
 
-So, now we have a good idea of a target, but how do we know which functions to hook in order to extract credentials? This is where frida-trace comes to the rescue. We can simply specify the module we're interested in and hook all functions within it:
+So, now we have a good idea of which module we want to target, but how do we know which functions to hook in order to extract credentials? This is where frida-trace comes to the rescue. We can simply specify the module we're interested in and hook all functions within it:
 
 ```bash
 frida-trace -H 192.168.1.120 lsass.exe -i 'msv1_0.DLL!*'
