@@ -1,4 +1,4 @@
-remote_theme: jekyll-theme-midnight
+theme: jekyll-theme-midnight
 title: Calzone Breaks Things
 description: Exploring memory, reverse engineering, and possibly some other things.
 show_downloads: false
