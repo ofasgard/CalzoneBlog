@@ -1,5 +1,6 @@
 ---
 title: Dumping Lsass with... Frida?
+description: A blog about dynamic instrumentation of Lsass for fun and profit!
 ---
 
 # Dumping Lsass with... Frida?
