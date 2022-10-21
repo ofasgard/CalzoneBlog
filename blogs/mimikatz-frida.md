@@ -7,9 +7,9 @@ description: A blog about dynamic instrumentation of Lsass for fun and profit!
 
 Recently I've been getting into [Frida](https://frida.re/), a great debugging and dynamic instrumentation tool with cross-platform support. Before I looked into it, I'd only ever heard of Frida as a tool for hacking mobile apps - I'd never considered it for anything else. However, I think Frida has just as much potential as a rapid prototyping tool for reverse engineering and exploit development. It's agile, portable and fast, which makes it an excellent choice for experimenting and tinkering with a process.
 
-I've had advice in the past that writing your own Mimikatz implementation is one of the best ways to get familiar working with memory hacking in Windows. Writing something like this in Frida isn't something I've seen anyone else do, so I felt it would be a good challenge. How can you use Frida to dump Lsass?
+I've had advice in the past that writing your own Mimikatz implementation is one of the best ways to get familiar working with memory hacking in Windows. A credential dumper that requires you to execute and connect to a Frida server on the target probably wouldn't be your first choice on an engagement. However, it's also not something I've seen anyone else doing, and I hoped that the end result would be a kind of "intermediary" tool that could be trivially ported to other languages. 
 
-A credential dumper that requires you to execute and connect to a Frida server on the target probably wouldn't be your first choice on an engagement. However, I hoped that the simplicity of Frida's debugging language would result in a kind of "intermediary" tool that could be trivially ported to other languages. So without further ado, let's break Lsass!
+So without further ado, let's break Lsass!
 
 ## Step 1: Exploring Lsass
 
