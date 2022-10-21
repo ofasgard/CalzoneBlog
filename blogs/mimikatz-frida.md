@@ -15,6 +15,18 @@ So without further ado, let's break Lsass!
 
 You can find a wealth of tools and tutorials out there which discuss how mimikatz works and how to dump credentials from the process memory of Lsass. I wanted to make a start completely blind, though, and see what I could discover with Frida alone.
 
+To start with, I spun up a Windows 10 VM and launched the latest version of Frida server as Administrator:
+
+```powershell
+> .\frida-server.exe -l 0.0.0.0
+```
+
+This opens a debugging server on port 27042, which we can connect to using Frida:
+
+```bash
+$ frida -H 192.168.1.120 lsass.exe
+```
+
 
 <!--
 Resources that helped me, which I should credit:
