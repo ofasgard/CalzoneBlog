@@ -107,6 +107,29 @@ And invoke another interactive logon.
 
 ## Step 3: Parsing PrimaryCredentials
 
+So, now we can hook the `LsaApLogonUserEx2()` function and get a pointer to the PrimaryCredentials structure. How do we turn that into actual credential information? The PrimaryCredentials structure is of type `PSECPKG_PRIMARY_CRED`, which means it's a pointer to a `SECPKG_PRIMARY_CRED` struct. Happily for us, that struct is [documented for us as well](https://docs.microsoft.com/en-us/windows/win32/api/ntsecpkg/ns-ntsecpkg-secpkg_primary_cred):
+
+```text
+typedef struct _SECPKG_PRIMARY_CRED {
+  LUID           LogonId;
+  UNICODE_STRING DownlevelName;
+  UNICODE_STRING DomainName;
+  UNICODE_STRING Password;
+  UNICODE_STRING OldPassword;
+  PSID           UserSid;
+  ULONG          Flags;
+  UNICODE_STRING DnsDomainName;
+  UNICODE_STRING Upn;
+  UNICODE_STRING LogonServer;
+  UNICODE_STRING Spare1;
+  UNICODE_STRING Spare2;
+  UNICODE_STRING Spare3;
+  UNICODE_STRING Spare4;
+} SECPKG_PRIMARY_CRED, *PSECPKG_PRIMARY_CRED;
+```
+
+This gives us all the information we need to write our own parser in Frida.
+
 
 <!--
 Resources that helped me, which I should credit:
