@@ -186,7 +186,7 @@ And the final result when running it against my Windows 10 VM and initiating an 
 
 ## Conclusion
 
-Hooking functions and changing their behaviour is Frida's bread and butter, and we've demonstrated just how easy it is to backdoor Lsass with Frida. All you need is a little bit of Javascript, a little bit of C struct knowledge, and local admin. In the next part, we'll move away from hooking functions and look into replicating Mimikatz functionality by extracting credentials directly from memory.
+Hooking functions and changing their behaviour is Frida's bread and butter, and we've demonstrated just how easy it is to backdoor Lsass with Frida. All you need to do so is a little bit of Javascript, a little bit of C struct knowledge, and local admin. In the next part, we'll move away from hooking functions. Instead, we'll look into replicating Mimikatz functionality by extracting credentials directly from memory.
 
 <!--
 Resources that helped me, which I should credit:
