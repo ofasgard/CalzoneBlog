@@ -3,9 +3,6 @@ title: Calzone Breaks Things
 description: Exploring memory, reverse engineering, and possibly some other things.
 show_downloads: false
 
-github:
-  is_project_page: false
-
 plugins:
 - jekyll-remote-theme
 
