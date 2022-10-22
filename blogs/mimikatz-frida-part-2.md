@@ -62,7 +62,7 @@ This is where the signature comes in. When we identify this signature in memory 
 1. Find the address where the signature appears.
 2. Add some predetermined offset to get to the instruction which dereferences *LogonSessionList*.
 3. Skip the first 3 bytes, which are the opcodes, and read the %rip offset from the latter part of the instruction.
-4. Find what RIP will be just after our target instruction, then add the offset to get the true address of *LogonSessionList*.
+4. Find what %rip will be just after our target instruction, then add the offset to get the true address of *LogonSessionList*.
 
 By following these four steps, it's possible to write a function in Frida which, when provided with a pointer and an offset, will find the dereferenced address:
 
