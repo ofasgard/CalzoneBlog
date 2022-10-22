@@ -55,7 +55,7 @@ The first global variable we're interested in is *lsasrv!LogonSessionList*. As t
 lea rcx, [rip + 0x118061] ; LogonSessionList
 ```
 
-Note that the address itself is a %rip-relative offset (0x118061), which is determined at runtime. We're scanning memory at runtime, though, so as long as we can find the offset, we can perform some simple pointer arithmetic to find the actual address of the variable.
+Note that the address given in the instruction above is not an absolute address, but a %rip-relative offset (0x118061) which is calculated at runtime. We're scanning memory at runtime, though, so as long as we can find the offset, we can perform some simple pointer arithmetic to find the actual address of the variable.
 
 This is where the signature comes in. When we identify this signature in memory at a given address, we can add a certain offset to it and get to that instruction. The exact process looks like this:
 
