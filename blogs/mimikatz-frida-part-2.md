@@ -49,4 +49,10 @@ With that, we have a way to scan the memory space of *lsasrv.dll* for those spec
 
 ## Finding LogonSessionList
 
-TODO
+The first global variable we're interested in is *lsasrv!LogonSessionList*. As the name implies, this is a linked list where every element represents a single credential cached in memory. The way Mimikatz finds this variable is clever; it needs to find an instruction in *lsasrv.dll* which dereferences the address of the variable. This instruction will look something like this:
+
+```asm
+lea rcx, [rip + 0x118061] ; LogonSessionList
+```
+
+Note that the address itself is a %rip-relative offset (0x118061), which is determined at runtime. We're scanning memory at runtime, though, so as long as we can find the offset, we can perform some simple pointer arithmetic to find the actual address of the variable.
