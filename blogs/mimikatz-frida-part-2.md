@@ -32,7 +32,7 @@ BYTE PTRN_WN1803_LogonSessionList[] = {0x33, 0xff, 0x41, 0x89, 0x37, 0x4c, 0x8b,
 BYTE PTRN_WN11_LogonSessionList[]	= {0x45, 0x89, 0x34, 0x24, 0x4c, 0x8b, 0xff, 0x8b, 0xf3, 0x45, 0x85, 0xc0, 0x74};
 ```
 
-We can use these precompiled signatures in our own code, although we could also deduce them ourselves using a debugger such as IDA or WinDBG if we needed to. All we need is a way to scan memory for a specific sequence of bytes, which happily Frida provides for us:
+We can use these precompiled signatures in our own code, although we could also deduce them ourselves with a little reverse engineering and a debugger such as IDA or WinDBG. All we need is a way to scan memory for a specific sequence of bytes, which happily Frida provides for us:
 
 ```javascript
 var lsasrv = Process.getModuleByName("lsasrv.dll")
