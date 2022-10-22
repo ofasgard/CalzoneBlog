@@ -188,7 +188,7 @@ function getLogonSessions(ptr, max) {
 }
 ```
 
-This will allow us to turn our pointer to *LogonSessionList* into an array of pointers, each pointing to a specific session. Now we need to parse the actual data out of them. This may seem intimidating when you look at the enormous struct that gentikiwi has implemented, but we only actually care about a few bits of information: the *UserName*, *DomainName* and *Credentials* variables.
+This will allow us to turn our pointer to *LogonSessionList* into an array of pointers, each pointing to a specific session. Now we need to parse the actual data out of them. This may seem intimidating when you look at the enormous struct that gentilkiwi has implemented and its many members, but we only actually care about a few bits of information: the *UserName*, *DomainName* and *Credentials* variables.
 
 The *UserName* and *DomainName* are simple. They are both of type *UNICODE_STRING*, and we've dealt with those before. It's trivial to write a simple parser to extract each value:
 
