@@ -110,3 +110,7 @@ Memory.scan(lsasrv.base, lsasrv.size, sequence, {
 	}
 });
 ```
+
+Testing this against our 64-bit Windows 10 VM, we can see that we're able to successfully identify the address of *LogonSessionList*:
+
+![Frida output demonstrating the address of LogonSessionList](/img/finding-logonsessionlist.png)
