@@ -38,7 +38,7 @@ We can use these precompiled signatures in our own code, although we could also 
 var lsasrv = Process.getModuleByName("lsasrv.dll")
 var sequence = "33 ff 41 89 37 4c 8b f3 45 85 c9 74"; 
 
-Memory.scan(lsasrv.base, lsasrv.size, WLsaEnumerateLogonSession, {
+Memory.scan(lsasrv.base, lsasrv.size, sequence, {
 	onMatch(signature, size) {
 		console.log("Found a match at " + signature);
 	}
