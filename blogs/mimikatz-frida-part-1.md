@@ -13,7 +13,7 @@ In this first part, we'll focus on taking advantage of Frida's dynamic instrumen
 
 ## Step 1: Exploring Lsass
 
-You can find a wealth of tools and tutorials out there which discuss how mimikatz works and how to dump credentials from the process memory of Lsass. I wanted to make a start completely blind, though, and see what I could discover with Frida alone.
+You can find a wealth of tools and tutorials out there which discuss how Mimikatz works and how to dump credentials from the process memory of Lsass. I wanted to make a start completely blind, though, and see what I could discover with Frida alone.
 
 To start with, I spun up a Windows 10 VM and launched the latest version of Frida server as Administrator:
 
@@ -97,7 +97,7 @@ Interceptor.attach(logonUser, {
 });
 ```
 
-So far, the script is pretty simple. We identify the address of the function and attach to it with Frida's interceptor. When the function is entered, we save the address of the PrimaryCredentials array. When the function exits, we print the address. To test it out, simply inject the script into Frida:
+So far, the script is pretty simple. We identify the address of the function and attach to it with Frida's Interceptor. When the function is entered, we save the address of the PrimaryCredentials array. When the function exits, we print the address. To test it out, simply inject the script into Frida:
 
 ```bash
 $ frida -H 192.168.1.120 lsass.exe -l LsaApLogonUserEx2.js
