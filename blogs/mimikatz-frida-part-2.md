@@ -18,7 +18,7 @@ If you are interested in exploring this subject further or get stuck on your own
 
 Previously, we used Frida's Interceptor to attach to the *LsaApLogonUserEx2()* function and intercept credentials as they were passed to it. Having access to debugging functionality makes this an easy thing to do, but Mimikatz doesn't have that luxury. It needs to directly scan the memory allocated to the Lsass process, and somehow identify exactly where those credentials are stored. Only then can it actually begin parsing and decrypting those structures in memory.
 
-We can look at the [Mimikatz source code](https://github.com/gentilkiwi/mimikatz/blob/master/mimikatz/modules/sekurlsa/kuhl_m_sekurlsa_utils.c) to figure out exactly how it accomplishes this. The answer is simpler than you may think - a hardcoded set of signatures is used to scan memory for the regions we're interested in. These signatures are obviously platform-dependent and are liable to change between different versions of Windows, so Mimikatz keeps several on them on-hand. Here is an example from the Mimikatz source:
+We can look at the [Mimikatz source code](https://github.com/gentilkiwi/mimikatz/blob/master/mimikatz/modules/sekurlsa/kuhl_m_sekurlsa_utils.c) to figure out exactly how it accomplishes this. The answer is simpler than you may think - a hardcoded set of signatures is used to scan memory for the regions we're interested in. These signatures are obviously platform-dependent and are liable to change between different versions of Windows, so Mimikatz keeps several of them on-hand. Here is an example from the Mimikatz source:
 
 ```c
 #elif defined(_M_X64)
