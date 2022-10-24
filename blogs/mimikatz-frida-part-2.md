@@ -167,7 +167,7 @@ typedef struct _KIWI_MSV1_0_LIST_63 {
 } KIWI_MSV1_0_LIST_63, *PKIWI_MSV1_0_LIST_63;
 ```
 
-Looking at this data structure, we can see that the first order of business will be to enumerate the address of each cached session. The *Flink* variable, a pointer to the next element in the list, is the very first element, so this is an easy job:
+That's an intimidating struct! Don't worry, we won't need all of it. Looking at this data structure, we can see that the first order of business will be to enumerate the address of each cached session. The *Flink* variable, a pointer to the next element in the list, is the very first element, so this is an easy job:
 
 ```javascript
 function getLogonSessions(ptr, max) {
@@ -188,7 +188,7 @@ function getLogonSessions(ptr, max) {
 }
 ```
 
-This will allow us to turn our pointer to *LogonSessionList* into an array of pointers, each pointing to a specific session. Now we need to parse the actual data out of them. This may seem intimidating when you look at the enormous struct that gentilkiwi has implemented and its many members, but we only actually care about a few bits of information: the *UserName*, *DomainName* and *Credentials* variables.
+This will allow us to turn our pointer to *LogonSessionList* into an array of pointers, each pointing to a specific session. Now we need to parse the actual data out of them. This may seem daunting, but we only actually care about a few bits of information: the *UserName*, *DomainName* and *Credentials* variables.
 
 The *UserName* and *DomainName* are simple. They are both of type *UNICODE_STRING*, and we've dealt with those before. It's trivial to write a simple parser to extract each value:
 
