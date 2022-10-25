@@ -243,7 +243,7 @@ Now we have the username, domain name, and credential material. We're not done y
 
 ## Keys to the Kingdom
 
-In order to be sure we can decrypt whatever credentials we have obtained from *lsasrv!LogonSessionList*, we will need to identify three variables: these are *lsasrv!hAesKey*, *lsasrv!h3DesKey* and the associated Initialization Vector (IV) for the AES key. Each of these values is regenerated every time `lsass.exe` is started, so we'll need to extract them every time we want to dump credentials.
+In order to be sure we can decrypt whatever credentials we have obtained from *lsasrv!LogonSessionList*, we will need to identify three variables: these are *lsasrv!hAesKey*, *lsasrv!h3DesKey* and the associated Initialization Vector (IV) for the AES key. Each of these values is regenerated every time *lsass.exe* is started, so we'll need to extract them every time we want to dump credentials.
 
 The process for obtaining these variables is exactly the same as for *LogonSessionList*, We need to use some predetermined signature and offset to find an instruction that dereferences them. We can reuse our function from before to do this:
 
@@ -292,6 +292,9 @@ function getAesIV(ptr) {
 }
 ```
 
-Now we have everything we need: the encrypted credential blobs, the AES key and associated IVs, and the 3DES key. All that's left is to pull it all together.
+Finally, we have everything we need - the user details, their encrypted credentials, and all of the decryption keys and associated IVs required to translate them into plaintext.
 
+## Beyond JavaScript
+
+At this point, we are finished with our Frida script (which you can find [here](#)). When we inject it into *lsass.exe*, it returns something that looks a bit like this:
 
