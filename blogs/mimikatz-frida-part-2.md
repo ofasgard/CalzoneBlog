@@ -298,3 +298,6 @@ Finally, we have everything we need - the user details, their encrypted credenti
 
 At this point, we are finished with our Frida script (which you can find [here](#)). When we inject it into *lsass.exe*, it returns something that looks a bit like this:
 
+![a screenshot of the raw output from MimiScan.y](/img/mimiscan.png)
+
+I think we can all agree that this is a little underwhelming. Sure, all the raw data is there - and we could manually grab those cryptoblobs and decryption keys and perform the decryption itself, of course. But we'd generally prefer all that stuff to be done for us - what we want is decrypted credentials scrolling across our screen. Implementing that decryption logic in Frida's JavaScript engine would be no fun at all, though; doing it in Python is much preferable.
