@@ -321,7 +321,6 @@ script = session.create_script(inject_script)
 Once we have attached, we need to create a hook that will receive and process messages sent to it by the injected script:
 
 ```python
-# Receive messages from MimiScan.js, don't attempt decryption until all messages have been received.
 def on_message(message, data):
 	if "payload" not in message:
 		return
