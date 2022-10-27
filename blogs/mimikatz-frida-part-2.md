@@ -342,7 +342,7 @@ script.on('message', on_message)
 script.load()
 ```
 
-Once you have the actual data, it's just a matter of performing the decryption and parsing out the important bits (the NTLM hash) from the resulting plaintext. Here's how it looks in action:
+Once you have the actual data, it's just a matter of performing the decryption and parsing out the important bits (the NTLM hash) from the resulting plaintext. This takes a little work, but it's nothing too complicated. Here's how the completed Python script looks in action:
 
 ![A screenshot of the output from the final version of MimiScan.py](/img/mimiscan-decrypted.png)
 
