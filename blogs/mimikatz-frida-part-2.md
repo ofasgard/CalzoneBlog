@@ -301,3 +301,5 @@ At this point, we are finished with our Frida script (which you can find [here](
 ![a screenshot of the raw output from MimiScan.y](/img/mimiscan.png)
 
 I think we can all agree that this is a little underwhelming. Sure, all the raw data is there - and we could manually grab those cryptoblobs and decryption keys and perform the decryption itself, of course. But we'd generally prefer all that stuff to be done for us - what we want is decrypted credentials scrolling across our screen. Implementing that decryption logic in Frida's JavaScript engine would be no fun at all, though; doing it in Python is much preferable.
+
+For this, we can use Frida's Python API. The way it works is simple: instead of injecting our Frida script into a process using the Frida CLI tool, we inject it using the *frida* Python library. The injected script is able to communicate back to the Python orchestrator with the *send()* function, which allows us to receive output such as credentials and decryption keys. We can then process it in Python instead of being stuck with JavaScript.
