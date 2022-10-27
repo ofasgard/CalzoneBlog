@@ -338,6 +338,9 @@ def on_message(message, data):
 		keys["aes_iv"] = data
 	if payload["type"] == "3deskey":
 		keys["3des"] = data
+
+script.on('message', on_message)
+script.load()
 ```
 
 Once you have the actual data, it's just a matter of performing the decryption and parsing out the important bits (the NTLM hash) from the resulting plaintext. You can find the full script [here](#); here's how it looks in action:
