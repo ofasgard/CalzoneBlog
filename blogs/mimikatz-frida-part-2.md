@@ -266,7 +266,7 @@ Memory.scan(lsasrv.base, lsasrv.size, sequence, {
 });
 ```
 
-Parsing the actual keys is very simple, thankfully. The AES and 3DES keys are parsed in the exact same way, and IV literally just needs to be read from a pointer:
+Parsing the actual keys is very simple, thankfully. The AES and 3DES keys are parsed in the exact same way, and the IV literally just needs to be read from a pointer:
 
 ```javascript
 function getKey(ptr) {
