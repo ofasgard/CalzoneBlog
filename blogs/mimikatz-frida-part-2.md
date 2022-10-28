@@ -45,7 +45,7 @@ Memory.scan(lsasrv.base, lsasrv.size, sequence, {
 });
 ```
 
-With that, we have a way to scan the memory space of *lsasrv.dll* for those specific sequences. Mimikatz uses these signatures to deduce the address of specific global variables that contain sensitive data, and that's what we're going to need to do as well.
+With that, we have a way to scan the memory space of *lsasrv.dll* for those specific sequences. Mimikatz uses these signatures to deduce the address of specific global variables in lsasrv that contain sensitive data, and that's what we're going to need to do as well.
 
 ## Finding LogonSessionList
 
