@@ -356,4 +356,6 @@ There's still a lot of work you can do from here. The implementation I've demons
 
 You may recall that my original reason for doing all this was some advice I had: that writing your own Mimikatz implementation will help you learn about process manipulation and working with low-level memory in Windows. This definitely held true for me, at least for this kind of reverse engineering. When it comes to interpreting and parsing a complex assembly of structs and pointers in memory, I think hands-on practice is probably the best way to get comfortable.
 
+Overall, this was an extremely satisfying project to work out and I recommend something like this to anyone who's looking for an excuse to get their hands dirty with a little reverse engineering and memory manipulation!
+
 
