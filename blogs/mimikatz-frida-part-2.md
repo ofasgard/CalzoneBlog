@@ -192,7 +192,7 @@ function getLogonSessions(ptr, max) {
 
 This will allow us to turn our pointer to *LogonSessionList* into an array of pointers, each pointing to a specific session. Now we need to parse the actual data out of them. This may seem daunting, but we only actually care about a few bits of information: the *UserName*, *DomainName* and *Credentials* variables.
 
-The *UserName* and *DomainName* are simple. They are both of type *UNICODE_STRING*, and we've dealt with those before. It's trivial to write a simple parser to extract each value:
+The *UserName* and *DomainName* are simple. They are both of type *UNICODE_STRING*, and we dealt with those in part 1. It's trivial to write a simple parser to extract each value:
 
 ```javascript
 function getUsernameFromLogonSession(ptr) {
