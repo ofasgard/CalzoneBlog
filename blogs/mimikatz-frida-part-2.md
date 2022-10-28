@@ -347,3 +347,13 @@ Once you have the actual data, it's just a matter of performing the decryption a
 ![A screenshot of the output from the final version of MimiScan.py](/img/mimiscan-decrypted.png)
 
 You can find the full script [here](#). And with that, we've created a basic Mimikatz-alike written almost entirely in Frida!
+
+## Conclusion
+
+My original aim was to illustrate that you can emulate the functionality of Mimikatz entirely within Frida's engine, and I think I've done that. Some of the more heavy-duty tasks, like 3DES decryption, are just not feasible to implement in JavaScript - but Frida's Python bindings are able to step up and fill the gaps when that's the case.
+
+There's still a lot of work you can do from here. The implementation I've demonstrated in this blog is brittle. Unlike Mimikatz, it only targets a specific version and architecture of Windows. You could definitely expand it to make it more robust, selecting different signatures and offsets based on the version of Windows it is executed on. You could also use this project as a springboard to create your own implementation in C, Go, .NET, and so on - the basic logic remains the same, all that changes are implementation details.
+
+You may recall that my original reason for doing all this was some advice I had: that writing your own Mimikatz implementation will help you learn about process manipulation and working with low-level memory in Windows. This definitely held true for me, at least for this kind of reverse engineering. When it comes to interpreting and parsing a complex assembly of structs and pointers in memory, I think hands-on practice is probably the best way to get comfortable.
+
+
