@@ -169,7 +169,7 @@ typedef struct _KIWI_MSV1_0_LIST_63 {
 } KIWI_MSV1_0_LIST_63, *PKIWI_MSV1_0_LIST_63;
 ```
 
-That's an intimidating struct! Don't worry, we won't need all of it. Looking at this data structure, we can see that the first order of business will be to enumerate the address of each cached session. The *Flink* variable, a pointer to the next element in the list, is the very first element, so this is an easy job:
+That's an intimidating struct! Don't worry, we won't need all of it. This is just the first element in a linked list, representing a single cached credential. We want all of the credentials, so the first order of business is to enumerate the address of every other element in the list. The *Flink* variable, a pointer to the next element in the list, is the very first element, so this is an easy job:
 
 ```javascript
 function getLogonSessions(ptr, max) {
