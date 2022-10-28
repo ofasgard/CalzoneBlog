@@ -296,7 +296,7 @@ Finally, we have everything we need - the user details, their encrypted credenti
 
 ## Beyond JavaScript
 
-At this point, we are finished with our Frida script (which you can find [here](#)). When we inject it into *lsass.exe*, it returns something that looks a bit like this:
+At this point, we are finished with our Frida script (which you can find [here](https://github.com/ofasgard/mimiscan/blob/main/MimiScan.js)). When we inject it into *lsass.exe*, it returns something that looks a bit like this:
 
 ![a screenshot of the raw output from MimiScan.y](/img/mimiscan.png)
 
@@ -346,7 +346,7 @@ Once you have the actual data, it's just a matter of performing the decryption a
 
 ![A screenshot of the output from the final version of MimiScan.py](/img/mimiscan-decrypted.png)
 
-You can find the full script [here](#). And with that, we've created a basic Mimikatz-alike written almost entirely in Frida!
+And with that, we've created a basic Mimikatz-alike written almost entirely in Frida! You can find the full script, and all of the code associated with this project, [here](https://github.com/ofasgard/mimiscan). 
 
 ## Conclusion
 
