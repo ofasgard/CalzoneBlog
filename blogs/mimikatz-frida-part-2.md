@@ -92,7 +92,7 @@ function findDereferencedAddress(ptr, offset) {
 		var ripOffset = new NativePointer(ripOffsetInt);
 		// Finally, we need to convert the offset into an actual address.
 		// To do this, find what RIP will be just after our target instruction, then add the offset.
-		var rip = targetAddress.add(targetInstruction.size);
+		var rip = targetInstruction.next;
 		var target = rip.add(ripOffset);
 		return target;
 	}
