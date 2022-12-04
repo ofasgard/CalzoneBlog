@@ -1,3 +1,3 @@
 - [Dumping Lsass with... Frida? (Part 1)](/blogs/mimikatz-frida-part-1) **(21/10/2022)**
 - [Dumping Lsass with... Frida? (Part 2)](/blogs/mimikatz-frida-part-2) **(28/10/2022)**
-- [Frida vs. AMSI](/blogs/frida-vs/amsi) **(04/12/2022)**
+- [Frida vs. AMSI](/blogs/frida-vs-amsi) **(04/12/2022)**
