@@ -107,7 +107,7 @@ HRESULT AmsiOpenSession(
 );
 ```
 
-This function is used to create the *HAMSISESSION* object that gets passed to *AmsiScanBuffer()*, and it gets called whenever a sample is getting sent to AMSI. Notice how just like *AmsiScanBuffer()*, it returns a *HRESULT* containing an error code when it completes. This is important - remember this outdated oneliner from before?
+This function is used to create the *HAMSISESSION* object that gets passed to *AmsiScanBuffer()*, and so it also gets called whenever a sample is sent to AMSI. Notice how just like *AmsiScanBuffer()*, it returns a *HRESULT* containing an error code when it completes. This is important - remember this outdated oneliner from before?
 
 ```powershell
 [Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
@@ -131,19 +131,20 @@ Here are all of the blocks that can potentially end up returning the E_INVALIDAR
 
 1. Test if %rdx is equal to zero. This is the second argument, or *AmsiSession*.
 2. Test if %rcx is equal to zero. This is the first argument, or *AmsiContext*.
-3. Compare the first DWORD of *AmsiContext* with a hardcoded value, 0x49534d41 ("AMSI").
+3. Compare the first DWORD of *AmsiContext* with a hardcoded signature value, 0x49534d41 ("AMSI").
 4. Test if the QWORD at *AmsiContext+0x8* is equal to zero.
 5. Test if the QWORD at *AmsiContext+0x10* is equal to zero.
 
 So, this gives a number of candidates for alternate bypasses:
 
-1. Just hook *AmsiOpenSession()* and force the return value to be 0x80070057.
+1. Hook *AmsiOpenSession()* and force the return value to be 0x80070057.
 2. Hook *AmsiOpenSession()* and replace the first argument with a null pointer.
 3. Hook *AmsiOpenSession()* and replace the second argument with a null pointer.
-4. Hook *AmsiOpenSession()* and corrupt the first 4 bytes of *AmsiContext*.
-5. Hook *AmsiOpenSession()* and corrupt the QWORD at offset 0x8 or 0x10.
+4. Hook *AmsiOpenSession()* and replace the first argument with a pointer to an invalid buffer.
+5. Hook *AmsiOpenSession()* and corrupt the first 4 bytes of *AmsiContext*.
+6. Hook *AmsiOpenSession()* and zero out the QWORD at offset 0x8 or 0x10.
 
-We don't need to implement every single one of these to prove our point, but let's do a few. Here's an example that allocates a null buffer and replaces *AmsiContext* with it:
+We don't need to implement every single one of these to prove our point, but let's do a few. Here's an example that allocates a dummy buffer and replaces *AmsiContext* with it:
 
 ```javascript
 //find AmsiOpenSession()
@@ -235,11 +236,11 @@ Each of these scripts takes a different approach towards the same result: the *A
 
 ## Hooking is not Patching
 
-Coming up with a bunch of different ways to hook AMSI functions and break them with Frida is pretty cool, but it's not exactly portable. Any AMSI bypass that requires you to attach to a process with Frida is not exactly resilient. Ideally, we want something like the *AmsiScanBuffer()* patch - a way to corrupt AMSI in memory directly, without needing to hook into functions to do so.
+Coming up with a bunch of different ways to hook AMSI functions and break them with Frida is pretty cool, but it's not exactly portable. Any AMSI bypass that requires you to attach to a process with Frida is not exactly resilient. Ideally, we want something like the classic *AmsiScanBuffer()* patch we discussed earlier - a hassle-free way to corrupt AMSI in memory directly, without needing to hook into functions to do so.
 
-The classic *AmsiScanBuffer()* patch works by simply short-circuiting the function and returning zero immediately, but we've seen that there's a wide variety of ways to make the function return E_INVALIDARG and disable AMSI that way. The easiest to apply in the form of a code patch is the check which compares the first four bytes of *AmsiContext* to a hardcoded signature value of "AMSI". 
+The classic *AmsiScanBuffer()* patch works by simply short-circuiting the function and returning zero immediately, but we've seen that there's a wide variety of ways to make the function return E_INVALIDARG and disable AMSI that way. The easiest thing to break in the form of a code patch is the check which compares the first four bytes of *AmsiContext* to a hardcoded signature value of "AMSI". 
 
-All we need to do is find the hardcoded signature in the code and change it to something else. Then, whenever it checks for the signature it will be using the wrong value to compare against - and will always return an error. We can use Frida's memory scanning functionality to identify the exact sequence we're interested in modifying:
+All we need to do is find the hardcoded signature in the code and change it to something else. Whenever *AmsiScanBuffer()* checks for the signature, it will be using the wrong value as a baseline for the comparison - and will always return an error. We can use Frida's memory scanning functionality to identify the exact sequence we're interested in modifying, and then modify it:
 
 ```javascript
 var amsi = Process.getModuleByName("amsi.dll");
@@ -264,7 +265,7 @@ Memory.scan(amsiScanBuffer, size.toInt32(), sequence, {
 });
 ```
 
-There's another angle of attack for us to use, though. We don't have to patch the code - we can patch the data, instead. As long as the process has scanned something with AMSI at least once, there will be a global variable stored somewhere on the heap that contains an *AmsiContext* object for future use. If we can find it, we can corrupt it instead:
+Or we could take a different approach entirely! We don't have to patch the code - we can patch the data, instead. As long as the process has scanned something with AMSI at least once, there will be a global variable stored somewhere on the heap that contains an *AmsiContext* object for future use. If we can find it, we can corrupt it:
 
 ```javascript
 var heap = Process.enumerateMallocRanges();
@@ -294,7 +295,7 @@ That one seems interesting. Being able to use reflection to load a .NET assembly
 
 ![a screenshot of an AMSI error even after bypassing AMSI](/img/amsipatch_reflection.png)
 
-We're not sure exactly where *clr.dll* (which is the Common Language Runtime that manages the .NET runtime environment) invokes and uses AMSI functionality, but it's a pretty good bet that there's a global variable somewhere that contains an *AmsiContext* object. If that is indeed the case, there will be a pointer to it somewhere in memory ranges allocated for *clr.dll*.
+We're not sure exactly where *clr.dll* (which is the Common Language Runtime that manages the .NET runtime environment) invokes and uses AMSI functionality, but it's a pretty good bet that there's a global variable somewhere that contains an *AmsiContext* object. If that is indeed the case, there will be a pointer to it somewhere in the memory ranges allocated to *clr.dll*.
 
 A bruteforce approach to this problem begins to emerge:
 
@@ -353,12 +354,13 @@ If we run this script against our Powershell process once again, we'll see that 
 ![a screenshot of an AMSI patcher that works on the CLR](/img/amsipatch_reflection_during.png)
 ![a screenshot of a patched powershell allowing malicious assemblies to load](/img/amsipatch_reflection_after.png)
 
-The heap scanning example we used previous would probably work as well - as long as you have some understanding of which module is intrumenting AMSI and where they keep their variables, you have a pretty good shot at bypassing it.
+The heap scanning example we used previously would probably work as well - as long as you have some understanding of which module is intrumenting AMSI and where they keep their variables, you have a pretty good shot at bypassing it.
 
 ## Conclusion
 
-We've established that AMSI is more like a speed bump than a roadblock for any attacker who controls the process they're attacking. I don't think that's a particularly new conclusion to draw, but going through the process with Frida and Radare2 gave me a really good understanding of all the dials and levers you can press to break AMSI in different ways. Even if the AMSI bypass you get off the shelf works just fine, I think there's something to be said for understand the process well enough that you can iterate it and create your own versions of tools and techniques that don't match known signatures.
+We've established that AMSI is more like a speed bump than a roadblock for any attacker who controls the process they're attacking. On that note, it's worth pointing out that Frida was not running as a local admin in any of the examples given in this article. 
 
-As in my previous exploration of [Lsass Dumping with Frida](/blogs/mimikatz-frida-part-1.md), I don't know if I would have made so much progress so quickly (the whole journey took me about a week) if it was't for the existence of cross-platform tools that make it easy to inspect and manipulate processes. For me, the big takeaway is that getting really comfortable with reversing and debugging tools is the best way to remain a step ahead of EDR.
+I don't think that's a particularly new conclusion to draw, but exploring the process (no pun intended) gave me a really good understanding of all the dials and levers you can tweak to break AMSI in different and interesting ways. Even if the AMSI bypass you get off the shelf works just fine, I think there's something to be said for understanding the process well enough that you can iterate on it and create your own versions of tools and techniques that don't appear in any vendor's signature database.
 
+For me, the main takeaway is that getting really comfortable with reversing and debugging tools is the best way to remain a step ahead of EDR. Having access to cross-platform tools like Frida and Radare2 makes it really easy to inspect and play with running processes, and it makes getting to that level of comfort a whole lot easier. I don't know if I could have made so much progress so quickly without them (the whole journey took about a week).
 
