@@ -37,4 +37,6 @@ You can now invoke run documents remotely on the machine as long as the agent is
 aws ssm start-session --target <instance-id> --document-name AWS-StartPortForwardingSession --parameters '{"portNumber":["80"],"localPortNumber":["9999"]}'
 ```
 
-If you want to use the interactive session manager shell, also known as "Agent for Session Manager", go to [https://github.com/rprichard/winpty/](https://github.com/rprichard/winpty/) and download the latest release. Then Transfer `winpty.dll` and `winpty-agent.exe` to `C:\Program Files\Amazon\SSM\Plugins\SessionManagerShell\`. Note that it's only supported on Windows Server.
+If you want to use the interactive session manager shell (Windows Server only), go to [https://github.com/rprichard/winpty/](https://github.com/rprichard/winpty/) and download the latest release. Then transfer `winpty.dll` and `winpty-agent.exe` to:
+
+- `C:\Program Files\Amazon\SSM\Plugins\SessionManagerShell\`
