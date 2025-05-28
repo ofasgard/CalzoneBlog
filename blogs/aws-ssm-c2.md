@@ -7,10 +7,10 @@ description: Let's use Frida to explore all the different ways we can patch or b
 
 From my personal notes. Communication with the AWS API is often ignored by EDR, and the SSM agent is a legitimate utility that has a business use case in many environments. Using standard enterprise tooling instead of signature C2 frameworks is a great way to maintain stealthy persistence in a heavily monitored environment.
 
-Step 1: Clone from [https://github.com/aws/amazon-ssm-agent](https://github.com/aws/amazon-ssm-agent) and build for Windows.
-Step 2: Transfer all binaries from appropriate release folder to target machine. Put them in `C:\Program Files\Amazon\SSM\` as admin.
-Step 3: Log into the AWS console for your own tenant. Navigate to Systems Manager, and from there to *Hybrid Activations*.
-Step 4: Create a new hybrid activation. Record the activation code and ID.
+Step 1: Clone from [https://github.com/aws/amazon-ssm-agent](https://github.com/aws/amazon-ssm-agent) and build for Windows.  
+Step 2: Transfer all binaries from appropriate release folder to target machine. Put them in `C:\Program Files\Amazon\SSM\` as admin.  
+Step 3: Log into the AWS console for your own tenant. Navigate to Systems Manager, and from there to *Hybrid Activations*.  
+Step 4: Create a new hybrid activation. Record the activation code and ID.  
 
 Step 5: If required, set proxy information on the target machine:
 
