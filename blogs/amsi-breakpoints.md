@@ -19,7 +19,7 @@ The basic idea is still the same: we're still patching the *AmsiScanBuffer()* fu
 
 If you want more background on that, check out the previous article linked above.
 
-The way we're going to execute that patch is different, however. We're going to use hardware breakpoints to intercept *AmsiScanBuffer()*, a technique I can't take credit for. I learned about it from an article in [VXUnderground Black Mass Halloween 2022](https://vx-underground.org/Papers/Other/VXUG%20Zines).
+The way we're going to execute that patch is different, however. We're going to use hardware breakpoints to intercept *AmsiScanBuffer()*, a technique I can't take credit for. I learned about it from an article in [VXUnderground Black Mass Halloween 2022](https://vx-underground.org/Papers/Other/VXUG%20Zines), which I highly recommend for any detection-averse hackers who know their way around C. It's a great read.
 
 The basic idea works as follows:
 
