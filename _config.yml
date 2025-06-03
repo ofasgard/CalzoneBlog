@@ -1,6 +1,6 @@
 theme: jekyll-theme-midnight
 title: Calzone Breaks Things
-description: Exploring memory, reverse engineering, and possibly some other things.
+description: Exploring memory, reverse engineering, and fuzzing.
 show_downloads: false
 
 plugins:
