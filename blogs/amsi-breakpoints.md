@@ -23,7 +23,7 @@ The basic idea works as follows:
 
 1. Create a DLL which must be injected into or loaded by the process you want to patch AMSI for. 
 2. Within *DllMain()*, identify the memory address of the *DllCanUnloadNow()* function in the mapped version of AMSI.DLL. It precedes the function we're actually interested in.
-3. Use egg-hunting techniques to scan forward from *DllCanUnloadNow()*, searching for the start of *AmsiScanBuffer()*. This indirect approach helps with evasion, as per the **@am0nsec** implementation.
+3. Use egg-hunting techniques to scan forward from *DllCanUnloadNow()*, searching for the start of *AmsiScanBuffer()*. This indirect approach helps with evasion, as per the old **@am0nsec** implementation.
 4. Manipulate debug registers to set a hardware breakpoint on the address of *AmsiScanBuffer()*. When the function is invoked, a special exception will be thrown.
 5. Register an exception handler which simply redirects execution to the end of the function.
 
