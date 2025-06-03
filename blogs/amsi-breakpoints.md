@@ -27,7 +27,8 @@ The basic idea works as follows:
 4. Manipulate debug registers to set a hardware breakpoint on the address of *AmsiScanBuffer()*. When the function is invoked, a special exception will be thrown.
 5. Register an exception handler which manipulates the rip register to redirect execution to the end of the *AmsiScanBuffer()* function, bypassing it.
 
-As with other egg-hunting AMSI patching techniques, this approach is somewhat fragile as the specific signatures we're searching for will change between different versions of Windows.
+As with other egg-hunting AMSI patching techniques, this approach is somewhat fragile. The specific signatures we're searching for will change between different versions of Windows, and the bypass will need to be manually adjusted to work on those newer builds.
+
 ## Proof of Concept
 
 Note that this is only a proof of concept and hasn't been tested extensively. Here's what it looks like:
