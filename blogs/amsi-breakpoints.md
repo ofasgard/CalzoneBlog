@@ -176,6 +176,8 @@ Upon running `inject.exe` with the correct path and the PID of your Powershell p
 
 ![a screenshot that demonstrates the breakpoint AMSI bypass](/img/amsi-breakpoint.png)
 
+If you don't, then you might need to adjust the "egg" to match the function signature of *AmsiScanBuffer()* for your version of Windows. [The previous article](/blogs/frida-vs-amsi) describes how you can use Frida to easily extract those bytes.
+
 ## Conclusion
 
 I won't be publishing the code for this AMSI bypass elsewhere, as I haven't tested it extensively enough to be sure it functions reliably. On my Windows 10 testing VM, though, it was enough to bypass AMSI without triggering the (non-enterprise) Windows Defender present on the system.
