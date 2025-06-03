@@ -17,7 +17,7 @@ In this article, I'll describe another approach to patching AMSI. I also hope to
 
 The basic idea is recognisable from the previous article in this series: we're still patching the *AmsiScanBuffer()* function to short-circuit its functionality. In this case, we're going to simply redirect execution to the RET instruction at the end of *AmsiScanBuffer()* whenever it gets invoked. The function will return instantly with a default return value of 0.
 
-The way we're going to execute that patch is different, however. We're going to use hardware breakpoints to intercept *AmsiScanBuffer()*, a technique I can't take credit for. I learned about it from an article in [VXUnderground Black Mass Halloween 2022](https://vx-underground.org/Papers/Other/VXUG%20Zines), which I highly recommend for any detection-averse hackers who know their way around C. It's a great read.
+The way we're going to execute that patch is different, however. We're going to use hardware breakpoints to intercept *AmsiScanBuffer()*, a technique I can't take credit for. I learned about it from an article in [VXUnderground Black Mass Halloween 2022](https://vx-underground.org/Papers/Other/VXUG%20Zines), which I highly recommend if you're comfortable with C. It's a great read.
 
 The basic idea works as follows:
 
