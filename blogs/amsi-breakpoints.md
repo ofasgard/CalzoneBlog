@@ -9,7 +9,7 @@ In my [previous article on bypassing AMSI](/blogs/frida-vs-amsi), I discussed va
 
 All of these techniques are certainly effective, and Frida was a great tool for rapidly implementing and experimenting with them.
 
-However, none of them are particularly stealthy. Patching a process in memory is a fairly noisy activity. While it won't get picked up by every EDR if you're not using signatured tooling, any EDR with a robust behavioural analysis function is likely to flag this as suspicious behaviour.
+However, none of them are particularly stealthy. Patching a process in memory is a fairly noisy activity. While it might not get picked up by *every* EDR as long as you're not using signatured tooling, any EDR with a robust behavioural analysis function is likely to flag this as suspicious behaviour.
 
 In this article, I'll describe another approach to patching AMSI. I also hope to further demonstrate Frida's usefulness as a rapid prototyping tool, as it was my earlier research using Frida that brought me here in the first place.
 
