@@ -31,7 +31,7 @@ As with other egg-hunting AMSI patching techniques, this approach is somewhat fr
 
 ## Proof of Concept
 
-Note that this is only a proof of concept and hasn't been tested extensively. Here's what it looks like:
+Note that this is only a proof of concept and hasn't been tested extensively. It doesn't have error handling and isn't opsec-friendly. Still, here's what it looks like:
 
 ```c
 #include <windows.h>
