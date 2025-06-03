@@ -2,3 +2,4 @@
 - [Dumping Lsass with... Frida? (Part 2)](/blogs/mimikatz-frida-part-2) **(28/10/2022)**
 - [Frida vs. AMSI](/blogs/frida-vs-amsi) **(04/12/2022)**
 - [Using Amazon SSM as a C2 implant](/blogs/aws-ssm-c2) **(28/05/2025)**
+- [Frida vs. AMSI - Beyond Prototyping](/blogs/amsi-breakpoints) **(03/06/2025)**
