@@ -5,7 +5,9 @@ description: We broke AMSI in theory, but now let's turn it into a real exploit!
 
 # Frida vs. AMSI - Beyond Prototyping
 
-In my [previous article on bypassing AMSI](/blogs/frida-vs-amsi), I discussed various approaches to disabling AMSI on a Windows system - by hooking and intercepting key functions, by patching them in memory, or by corrupting the data structures that AMSI relies on to function. All of these techniques are certainly effective, and Frida was a great tool for rapidly implementing and experimenting with them.
+In my [previous article on bypassing AMSI](/blogs/frida-vs-amsi), I discussed various approaches to disabling AMSI on a Windows system - by hooking and intercepting key functions, by patching them in memory, or by corrupting the data structures that AMSI relies on to function. 
+
+All of these techniques are certainly effective, and Frida was a great tool for rapidly implementing and experimenting with them.
 
 However, none of them are particularly stealthy. Patching a process in-memory is a fairly noisy activity; while it won't get picked up by every EDR if you're not using signatured tooling or techniques, any EDR with a robust behavioural analysis function is likely to flag this as suspicious behaviour.
 
