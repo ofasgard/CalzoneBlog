@@ -182,6 +182,6 @@ If you don't, then you might need to adjust the "egg" to match the function sign
 
 I won't be publishing the code for this AMSI bypass elsewhere, as I haven't tested it extensively enough to be sure it functions reliably. On my Windows 10 testing VM, though, it was enough to bypass AMSI without triggering the (non-enterprise) Windows Defender present on the system.
 
-Breakpoint hooking is a technique I have injected (pun intended) from my own reading, but everything else I did here builds on the things I learned about AMSI by using Frida to explore it. I think it's a great illustration of how you can use reverse engineering and instrumentation tools to go from idea to prototype, and then prototype to proof of concept.
+Breakpoint hooking is a technique I have injected (pun intended) from my own reading, but everything else I did here builds on the things I learned about AMSI by using Frida to explore its functionality. I think it's a great illustration of how you can use reverse engineering and instrumentation tools to go from idea to prototype, and then prototype to proof of concept.
 
 I might now go from proof of concept to finished tooling. It could certainly do with proper error handling and clean up, as well as a bit more obfuscation to throw off signature-based detections (i.e. we still have the "amsi.dll" string embedded in the DLL). Tools like this tend to get burned pretty quickly when you release them in public, though, so I'll probably be keeping any further development on this one to myself. 
