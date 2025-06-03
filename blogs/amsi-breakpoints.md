@@ -186,4 +186,4 @@ Breakpoint hooking is a technique I have injected (pun intended) from my own rea
 
 I might now go from proof of concept to finished tooling. It could certainly do with proper error handling and clean up, as well as a bit more obfuscation to throw off signature-based detections. For example, we still have the "amsi.dll" string embedded in the binary, which isn't ideal and would be easy to rectify. 
 
-Tools like this tend to get burned pretty quickly when you release them in public, though, so I'll probably leave any further development as an exercise for the reader.
+Tools like this tend to get burned pretty quickly when you release them publicly, though, so I'll probably leave any further development as an exercise for the reader.
