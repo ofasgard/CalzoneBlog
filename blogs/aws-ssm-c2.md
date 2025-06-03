@@ -5,7 +5,9 @@ description: Let's use Frida to explore all the different ways we can patch or b
 
 # Using Amazon SSM as a C2 implant (Windows)
 
-From my personal notes. Communication with the AWS API is often ignored by EDR, and the SSM agent is a legitimate utility that has a business use case in many environments. Using standard enterprise tooling instead of signature C2 frameworks is a great way to maintain stealthy persistence in a heavily monitored environment.
+From my personal notes. 
+
+Communication with the AWS API is often ignored by EDR, and the SSM agent is a legitimate utility that has a business use case in many environments. Using standard enterprise tooling instead of signature C2 frameworks is a great way to maintain stealthy persistence in a heavily monitored environment.
 
 Step 1: Clone from [https://github.com/aws/amazon-ssm-agent](https://github.com/aws/amazon-ssm-agent) and build for Windows.  
 Step 2: Transfer all binaries from appropriate release folder to target machine. Put them in `C:\Program Files\Amazon\SSM\` as a local administrator.  
