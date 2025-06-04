@@ -61,7 +61,7 @@ Reverse engineering often requires us to delve into the disassembly, but the dec
 We can already infer a few things that are happening here:
 
 1. We're adding a Vectored Exception Handler, so presumably this DLL is expecting to handle an exception at some point. It's common for malware authors to use a VEH as a way to trigger a payload.
-2. We're getting the current pid, along with a handle to AMSI.DLL. 
+2. We're getting the current pid, along with a handle to AMSI.DLL. We might therefore assume that some kind of process manipulation will take place.
 3. We're looking up the address of a specific symbol within AMSI, *DllCanUnloadNow()*. According to [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow), this is just a standard function that is exported by DLLs that are to be dynamically loaded.
 
 We can guess that the purpose of this DLL is to interfere with AMSI somehow. However, the exact mechanism is still unclear. We have three avenues to explore:
