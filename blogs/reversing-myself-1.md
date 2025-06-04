@@ -95,7 +95,7 @@ Here's how it's being called now:
 ```c
 DVar2 = FUN_698013f4(
 	ExceptionInfo->ContextRecord->Rip,	// pointer to current instruction
-	&DAT_69809000,			// pointer to a buffer which contains a single byte (0xC3)
+	&DAT_69809000,			// pointer to a buffer which contains 0xC3
 	1,				// size of argument 2
 	500
 );
