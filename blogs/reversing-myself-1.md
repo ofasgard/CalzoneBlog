@@ -124,7 +124,9 @@ Most of the program is now fairly clear:
 
 We can assume that *FUN_69801627*, the setup function we identified earlier, is responsible for setting those breakpoints in the first place. But how, exactly? Let's start from the call to *memory_scanner()*. 
 
-Now that we know how it works, we can see that it starts from the address of *DllCanUnloadNow()* and scans forward into the executable code of AMSI.DLL. It's searching for a specific sequence of bytes; we can now infer that those bytes correspond to the signature of the actual function it wants to patch. Let's rename variables accordingly to make that clear:
+Now that we know how it works, we can see that it starts from the address of *DllCanUnloadNow()* and scans forward into the executable code of AMSI.DLL. It's searching for a specific sequence of bytes; we can now infer that those bytes correspond to the signature of the actual function it wants to patch. 
+
+Let's rename variables accordingly to make that clear:
 
 ![a screenshot of Ghidra showing a more throughly annotated DllMain](/img/amsi-reveng-9.png)
 
