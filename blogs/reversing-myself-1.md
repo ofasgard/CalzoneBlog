@@ -101,15 +101,13 @@ DVar2 = FUN_698013f4(
 );
 ```
 
-You might recognise 0xC3 as the opcode for the RET instruction.
-
 *FUN_698013f4* also has a return value, which must be a memory address since the VEH uses it to overwrite the value of RIP - redirecting execution to that address. Even without analysing *FUN_698013f4* ourselves, we can probably make a guess at its purpose: **it's a memory scanner**. 
 
 You pass it a memory address and a sequence of bytes. It returns a different memory address; the first instance of that sequence of those bytes in the scanned region. The final argument is probably the maximum number of bytes to scan. We can annotate the function as such:
 
 ![a screenshot of Ghidra showing the annotated memory_scanner function](/img/amsi-reveng-7.png)
 
-Armed with this information, we can guess what this exception handler does. When it receives an *EXCEPTION_SINGLE_STEP* event, it scans the current function for the next RET instruction. Then it redirects execution to that instruction, ensuring that the body of the function is never executed. It's a **patcher**.
+Armed with this information, we can guess what this exception handler does. When it is triggered by an *EXCEPTION_SINGLE_STEP* event, it scans the current function for the next RET instruction (opcode 0xC3). Then it redirects execution to that instruction, ensuring that the body of the function is never executed. It's a **patcher**.
 
 ## Analysing FUN_69801627
 
