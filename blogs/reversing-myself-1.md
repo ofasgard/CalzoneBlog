@@ -51,11 +51,12 @@ We can assert with a fair amount of confidence that *DllMain* is the start of us
 
 Here's what we have to work with:
 
-![a screenshot of Ghidra centred on DllMain](/img/amsi-reveng-4.png)
+[![a screenshot of Ghidra centred on DllMain](/img/amsi-reveng-4.png)](/img/amsi-reveng-4.png)
 
 Reverse engineering often requires us to delve into the disassembly, but the decompiler output for this binary isn't actually bad. Ghidra has automatically identified the Windows API call invocations, so there are only a few user-defined functions we're not sure about the provenance of. We can make things even clearer by annotating the correct arguments and return value for *DllMain*:
 
-![a screenshot of Ghidra centred on DllMain](/img/amsi-reveng-5.png)
+
+[![a screenshot of Ghidra centred on DllMain](/img/amsi-reveng-5.png)](/img/amsi-reveng-5.png)
 
 We can already infer a few things that are happening here:
 
@@ -150,8 +151,3 @@ The only thing we don't know is which exact function within AMSI.DLL is being pa
 Like I said at the beginning of the article, this was a warmup. With limited obfuscation and a fairly straightforward control flow, analysing this binary was a breeze. I didn't need to do any dynamic analysis or reverse-engineer any deobfuscation routines, and I didn't need to dive into the disassembly at any point. Still, it was fun to take apart something I made!
 
 I'm planning for this to be the first in the series. I've written a fair bit of "detection avoidant" software over the years - mostly as learning exercises, though some I've actually had the opportunity to deploy in red team engagements. I'm looking forward to sinking my teeth into something I actually designed to be stealthy!
-
-<!--
-clickable image example:
-[![a screenshot of a radare2 call graph](/img/amsiopensession.png)](/img/amsiopensession.png)
--->
