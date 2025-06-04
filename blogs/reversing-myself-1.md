@@ -132,7 +132,9 @@ Now that we know how it works, we can see that it starts from the address of *Dl
 
 ![a screenshot of Ghidra showing the decompiler for FUN_69801627](/img/amsi-reveng-10.png)
 
-Remember when I said I wasn't trying to be stealthy with this one? Thanks to a debug print statement left in the function, we can immediately see that we're on the right track. The purpose of this function is to hook a memory address. We can also see that Ghidra has gotten some of the auto-generated parameters wrong. We know these first two parameters should be a PID and a pointer, so let's fix that.
+Remember when I said I wasn't trying to be stealthy with this one? Thanks to a debug print statement left in the function, we can immediately see that we're on the right track. It's clear that the purpose of this function is to hook a memory address. 
+
+We can also see that Ghidra has gotten some of the auto-generated parameters wrong. These first two parameters should be a PID and a pointer based on what we saw in *DllMain()*, so let's fix that.
 
 ![a screenshot of Ghidra showing the decompiler for FUN_69801627](/img/amsi-reveng-11.png)
 
