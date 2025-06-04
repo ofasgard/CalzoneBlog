@@ -111,7 +111,7 @@ Armed with this information, we can guess what this exception handler does. When
 
 ## Analysing FUN_69801627
 
-Let's return to *DllMain()*. It looks a bit different now that we've introduced more context!
+Let's return to *DllMain()*, which looks a bit different now that we've introduced more context!
 
 ![a screenshot of Ghidra showing a more throughly annotated DllMain](/img/amsi-reveng-8.png)
 
