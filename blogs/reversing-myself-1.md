@@ -1,0 +1,107 @@
+---
+title: Reverse Engineering Myself, Part 1 (amsi-breakpoint.dll)
+description: I return to one of my own projects to hone my malware RevEng skills.
+---
+
+# Reverse Engineering Myself, Part 1 (amsi-breakpoint.dll)
+
+I recently completed FOR710, a SANS training course that dives deep into reverse engineering malware with Ghidra and various other tools. I found it hugely rewarding, but it was also clear to me that this is the kind of skill that gets rusty very quickly if you don't keep it.
+
+Over the course of my career, I've written various pieces of software that might uncharitably be called malware. Part of the reason I took FOR710 in the first place was to understand what my malware looks like from the defensive perspective (I also thought it might help with black-box vulnerability research).
+
+So, why not combine the two? By reverse engineering things I've written in the past, I can hone my reverse engineering skills. At the same time, I hope it will improve my understanding of the artifacts I left behind in code that was trying to be stealthy. That's the idea, anyway.
+
+For this first article in the series, I'll be revisiting the AMSI breakpoint proof of concept I showcased in [Frida vs. AMSI - Beyond Prototyping](/blogs/amsi-breakpoints). I wrote that PoC to showcase a technique for evading automated EDR, but didn't make any attempts to protect it from manual analysis. You can refer to the previous article to see the source code of the original tool; I won't be referencing or reproducing it here, though, as the point is to infer what it does **without** access to the original source code.
+
+This should be very easy to reverse engineer, so I consider this a bit of a warmup!
+
+## Initial Analysis
+
+I applied only the most basic obfuscation before analysing *amsi-breakpoint.dll*: I compiled it with `gcc -s` to strip debugging symbols, and then ran `strip` on it for good measure. Then I loaded it into Ghidra and analysed it.
+
+Ghidra easily identified it as a binary that was compiled with GCC. Compiling a Windows binary with MingGW GCC is a little unusual compared to using native Microsoft toolchains, and might be an early red flag for a defender. There was also a single error about missing MinGW relocation tables, presumably because it's a stripped binary. Ghidra complained, but seemed to analyse it without issue.
+
+Interestingly, the binary still contains a bunch of named functions in the export directory even though I stripped it!
+
+![a screenshot of the Ghidra symbol tree](/img/amsi-reveng-1.png)
+
+A little reading indicates that MinGW will actually export everything by default when you use it to create a DLL, not just *DllMain()*. This was news to me! Apparently you need to include this annotation:
+
+```c
+__attribute__((dllexport))
+```
+
+When you do that, all of the functions you **didn't** annotate will be hidden by default. I didn't want to make things too easy on myself, so I did that and recompiled it.
+
+![a screenshot of the Ghidra symbol tree](/img/amsi-reveng-2.png)
+
+Much better!
+
+## Finding the Entrypoint
+
+We can still see the *DllMain* export in the screenshot above. Since this a DLL and there's nothing else in the export table that looks interesting, it's a safe bet that this is going to be the entrypoint to our user-generated code. Still, in the interest of thoroughness we might want to confirm that this is indeed the main entrypoint for the binary.
+
+CFF Explorer shows that the *ImageBase* of the DLL is 0x6980000, and the *AddressOfEntryPoint* field is 0x1350. Within Ghidra, the pseudo-mapped address 0x69801350 corresponds to the *entry* symbol. So that's our program entrypoint. Exploring outgoing references from there, we can see *DllMain* is ultimately invoked from the entrypoint:
+
+![a screenshot illustrating the outgoing calls from the entry symbol](/img/amsi-reveng-3.png)
+
+We can assert with a fair amount of confidence that *DllMain* is the start of user-generated code, even if that wasn't obvious already. We'll bookmark it for easy reference and begin investigating it in more detail.
+
+## Analysing the Entrypoint
+
+Here's what we have to work with:
+
+![a screenshot of Ghidra centred on DllMain](/img/amsi-reveng-4.png)
+
+Reverse engineering often requires us to delve into the disassembly, but the decompiler output for this binary isn't actually bad. Ghidra has automatically identified the Windows API call invocations, so there are only a few user-defined functions we're not sure about the provenance of. We can make things even clearer by annotating the correct arguments and return value for *DllMain*:
+
+![a screenshot of Ghidra centred on DllMain](/img/amsi-reveng-5.png)
+
+We can already infer a few things that are happening here:
+
+1. We're adding a Vectored Exception Handler, so presumably this DLL is expecting to handle an exception at some point. It's common for malware authors to use a VEH as a way to trigger a payload.
+2. We're getting the current pid, along with a handle to AMSI.DLL. 
+3. We're looking up the address of a specific symbol within AMSI, *DllCanUnloadNow()*. According to [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow), this is just a standard function that is exported by DLLs that are to be dynamically loaded.
+
+We can guess that the purpose of this DLL is to interfere with AMSI somehow. However, the exact mechanism is still unclear. We have three avenues to explore:
+
+- *LAB_69801464*: This is the pointer passed to *AddVectoredExceptionHandler()*, containing the function that'll be used to catch exceptions. It's very likely this is where the actual AMSI bypass will occur.
+- *FUN_698013f4*: This function is passed the address of *DllCanUnloadNow()*. It's also passed a pointer to a hardcoded string of bytes which we can't immediately identify. It's unclear what it does.
+- *FUN_69801627*: This function only executes if *fdwReason* is 1, or "DLL_PROCESS_ATTACH". That is to say, it executes when the DLL is loaded. Therefore, it's probably responsible for performing some kind of setup.
+
+## Analysing LAB_69801464
+
+Since we've assessed that this symbol is where the AMSI bypass is likely to occur, this is where we'll start. We already know it's a [VectoredHandler](https://learn.microsoft.com/en-us/windows/win32/api/winnt/nc-winnt-pvectored_exception_handler), so we can annotate the function with the correct arguments and parameters:
+
+![a screenshot of Ghidra centred on LAB_69801464 which we have renamed to exception_handler](/img/amsi-reveng-6.png)
+
+Since it's so well-annotated, this is actually pretty straightforward to analyse. First of all, we're checking for exception code *0x80000004*. If you're at all familiar with debugging, this should raise immediate alarm bells. It's the exception code for *EXCEPTION_SINGLE_STEP*, which immediately tells us that this VEH is expecting to be triggered by a breakpoint.
+
+We can also see another call to *FUN_698013f4*, which we saw previously in *DllMain()*. Here's what it looked like back then:
+
+```c
+pauVar2 = FUN_698013f4(dllCanUnloadNowAddr, &DAT_6980901c, 0x18, 0xffff);
+```
+
+It was invoked with four arguments. The first two arguments are a pointer to *DllCanUnloadNow()* and a pointer to a mystery buffer of hardcoded bytes. The third argument is a numerical value, which corresponds to the length of the second argument. The fourth argument is equal to 65535, or one DWORD.
+
+Here's how it's being called now:
+
+```c
+DVar2 = FUN_698013f4(ExceptionInfo->ContextRecord->Rip, &DAT_69809000, 1, 500);
+```
+
+This time, it's being invoked with a pointer to the RIP register, i.e. the memory address of the current instruction. The second argument is a pointer to a buffer which contains a single hardcoded byte, 0xC3. You might recognise this as the opcode for the RET instruction.
+
+*FUN_698013f4* also has a return value, which must be a memory address since the VEH uses it to overwrite the value of RIP - redirecting execution to that address. Even without analysing *FUN_698013f4* ourselves, we can probably make a guess at its purpose: **it's a memory scanner**. 
+
+You pass it a memory address and a sequence of bytes. It returns a different memory address; the first instance of that sequence of those bytes in the scanned region. The final argument is probably the maximum number of bytes to scan. We can annotate the function as such:
+
+![a screenshot of Ghidra showing the annotated memory_scanner function](/img/amsi-reveng-6.png)
+
+Armed with this information, we can guess what this exception handler does. When it receives an *EXCEPTION_SINGLE_STEP*, it scans the current function for the next RET instruction. Then it redirects execution to that instruction, ensuring that the body of the function is never executed. It's a **patcher**.
+
+<!--
+clickable image example:
+[![a screenshot of a radare2 call graph](/img/amsiopensession.png)](/img/amsiopensession.png)
+-->
