@@ -84,9 +84,9 @@ We can also see another call to *FUN_698013f4*, which we saw previously in *DllM
 ```c
 pauVar2 = FUN_698013f4(
 	dllCanUnloadNowAddr,	// pointer to DllCanUnloadNow()
-	&DAT_6980901c, 			// pointer to a mystery buffer of hardcoded bytes
-	0x18, 					// size of argument 2
-	0xffff					// 65535
+	&DAT_6980901c, 		// pointer to a mystery buffer of hardcoded bytes
+	0x18, 			// size of argument 2
+	0xffff			// 65535
 );
 ```
 
