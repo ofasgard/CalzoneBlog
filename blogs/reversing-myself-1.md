@@ -149,7 +149,9 @@ It seems like *FUN_698014db* is where the actual breakpoint creation occurs - it
 
 It might actually be hard to figure out what's happening here without delving into the disassembly, but Ghidra has come to our rescue once again. It has automatically identified calls to *GetThreadContext()* and *SetThreadContext()* for us. These are two Windows APIs that can be used to manipulate the registers of a running thread.
 
-Thanks to that, we can see that values are being assigned to the Dr7 and Dr0 registers... and that one of those values is the address of the function this DLL wants to patch. A quick google shows that these are debug registers used to set hardware breakpoints. The Dr0 register is used to hold the address of the breakpoint, and the Dr7 register holds various bitflags that are used to configure, enable and disable the various breakpoints.
+Thanks to that, we can see that values are being assigned to the Dr0 and Dr7 registers... and that one of those values is the address of the function this DLL wants to patch. A quick google shows that Dr0 and Dr7 are debug registers used to set hardware breakpoints. 
+
+The Dr0 register is used to hold the address of the breakpoint, and the Dr7 register holds various bitflags that are used to configure, enable and disable the various breakpoints.
 
 ![a screenshot of Ghidra showing FUN_698014db with annotations](/img/amsi-reveng-13.png)
 
