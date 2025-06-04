@@ -128,7 +128,7 @@ Now that we know how it works, we can see that it starts from the address of *Dl
 
 ![a screenshot of Ghidra showing a more throughly annotated DllMain](/img/amsi-reveng-9.png)
 
-*FUN_69801627* is called with the PID of the current process and the address of the function we want to patch. It's also passed the 3rd and 4th arguments from *memory_scanner()*, which makes less sense, but let's take a deeper dive and see what we're working with.
+*FUN_69801627* is called with the PID of the current process and the address of the function we want to patch. It also gets passed the 3rd and 4th arguments from *memory_scanner()*, which makes less sense, but let's take a deeper dive and see what we're working with.
 
 ![a screenshot of Ghidra showing the decompiler for FUN_69801627](/img/amsi-reveng-10.png)
 
