@@ -97,9 +97,15 @@ This time, it's being invoked with a pointer to the RIP register, i.e. the memor
 
 You pass it a memory address and a sequence of bytes. It returns a different memory address; the first instance of that sequence of those bytes in the scanned region. The final argument is probably the maximum number of bytes to scan. We can annotate the function as such:
 
-![a screenshot of Ghidra showing the annotated memory_scanner function](/img/amsi-reveng-6.png)
+![a screenshot of Ghidra showing the annotated memory_scanner function](/img/amsi-reveng-7.png)
 
 Armed with this information, we can guess what this exception handler does. When it receives an *EXCEPTION_SINGLE_STEP*, it scans the current function for the next RET instruction. Then it redirects execution to that instruction, ensuring that the body of the function is never executed. It's a **patcher**.
+
+## Analysing FUN_69801627
+
+Let's return to *DllMain()*. It looks a bit different now that we've introduced more context!
+
+![a screenshot of Ghidra showing the annotated memory_scanner function](/img/amsi-reveng-8.png)
 
 <!--
 clickable image example:
