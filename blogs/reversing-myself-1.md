@@ -138,7 +138,7 @@ We can also see that Ghidra has gotten some of the auto-generated parameters wro
 
 ![a screenshot of Ghidra showing the decompiler for FUN_69801627](/img/amsi-reveng-11.png)
 
-Thanks to helpful annotation of Windows APIs by Ghidra, we can get the gist of what's happening here. We can see calls to *CreateToolhelp32Snapshot()* and *Thread32First()*, a popular technique for enumerating threads within the current process. It seems like we're iterating over every thread, getting a handle to it with *OpenThread()*, and then invoking *FUN_698014db* on it.
+Thanks to helpful annotation of Windows APIs by Ghidra, we can get the gist of what's happening here. There are calls to *CreateToolhelp32Snapshot()* and *Thread32First()*, a popular technique for enumerating threads within the current process. It seems like we're iterating over every thread, getting a handle to it with *OpenThread()*, and then invoking *FUN_698014db* on it.
 
 ## Analysing FUN_698014db
 
