@@ -3,3 +3,4 @@
 - [Frida vs. AMSI](/blogs/frida-vs-amsi) **(04/12/2022)**
 - [Using Amazon SSM as a C2 implant](/blogs/aws-ssm-c2) **(28/05/2025)**
 - [Frida vs. AMSI - Beyond Prototyping](/blogs/amsi-breakpoints) **(03/06/2025)**
+- [Reverse Engineering Myself, Part 1 (amsi-breakpoint.dll)](/blogs/reversing-myself-1) **(04/06/2025)**
