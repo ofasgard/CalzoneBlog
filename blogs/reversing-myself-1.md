@@ -107,7 +107,7 @@ You pass it a memory address and a sequence of bytes. It returns a different mem
 
 ![a screenshot of Ghidra showing the annotated memory_scanner function](/img/amsi-reveng-7.png)
 
-Armed with this information, we can guess what this exception handler does. When it is triggered by an *EXCEPTION_SINGLE_STEP* event, it scans the current function for the next RET instruction (opcode 0xC3). Then it redirects execution to that instruction, ensuring that the body of the function is never executed. It's a **patcher**.
+Armed with this information, we can guess what this exception handler does. When it is triggered by a breakpoint, it scans the current function for the next RET instruction (opcode 0xC3). Then it redirects execution to that instruction, ensuring that the body of the function is never executed. It's a **patcher**.
 
 ## Analysing FUN_69801627
 
