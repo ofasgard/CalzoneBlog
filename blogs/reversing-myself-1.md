@@ -90,15 +90,18 @@ pauVar2 = FUN_698013f4(
 );
 ```
 
-It was invoked with four arguments. The first two arguments are a pointer to *DllCanUnloadNow()* and a pointer to a mystery buffer of hardcoded bytes. The third argument is a numerical value, which corresponds to the length of the second argument. The fourth argument is equal to 65535, or one DWORD.
-
 Here's how it's being called now:
 
 ```c
-DVar2 = FUN_698013f4(ExceptionInfo->ContextRecord->Rip, &DAT_69809000, 1, 500);
+DVar2 = FUN_698013f4(
+	ExceptionInfo->ContextRecord->Rip,	// pointer to current instruction
+	&DAT_69809000,	// pointer to a buffer which contains a single byte (0xC3)
+	1,	// size of argument 2
+	500
+);
 ```
 
-This time, it's being invoked with a pointer to the RIP register, i.e. the memory address of the current instruction. The second argument is a pointer to a buffer which contains a single hardcoded byte, 0xC3. You might recognise this as the opcode for the RET instruction.
+You might recognise 0xC3 as the opcode for the RET instruction.
 
 *FUN_698013f4* also has a return value, which must be a memory address since the VEH uses it to overwrite the value of RIP - redirecting execution to that address. Even without analysing *FUN_698013f4* ourselves, we can probably make a guess at its purpose: **it's a memory scanner**. 
 
