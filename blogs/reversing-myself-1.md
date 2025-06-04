@@ -82,7 +82,12 @@ Since it's so well-annotated, this is actually pretty straightforward to analyse
 We can also see another call to *FUN_698013f4*, which we saw previously in *DllMain()*. Here's what it looked like back then:
 
 ```c
-pauVar2 = FUN_698013f4(dllCanUnloadNowAddr, &DAT_6980901c, 0x18, 0xffff);
+pauVar2 = FUN_698013f4(
+	dllCanUnloadNowAddr,	// pointer to DllCanUnloadNow()
+	&DAT_6980901c, 			// pointer to a mystery buffer of hardcoded bytes
+	0x18, 					// size of argument 2
+	0xffff					// 65535
+);
 ```
 
 It was invoked with four arguments. The first two arguments are a pointer to *DllCanUnloadNow()* and a pointer to a mystery buffer of hardcoded bytes. The third argument is a numerical value, which corresponds to the length of the second argument. The fourth argument is equal to 65535, or one DWORD.
