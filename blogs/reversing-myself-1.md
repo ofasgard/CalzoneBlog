@@ -7,7 +7,7 @@ description: I return to one of my own projects to hone my malware RevEng skills
 
 I recently completed FOR710, a SANS training course that dives deep into reverse engineering malware with Ghidra and various other tools. I found it hugely rewarding, but it was also clear to me that this is the kind of skill that gets rusty very quickly if you don't keep at it.
 
-Over the course of my career, I've written various pieces of software that might uncharitably be called malware. Part of the reason I took FOR710 in the first place was to understand what my malware looks like from the defensive perspective (I also thought it might help with black-box vulnerability research).
+Over the course of my career, I've written various pieces of software that might uncharitably be called malware. Part of the reason I took FOR710 in the first place was to understand what my binaries look like from the defensive perspective (I also thought it might help with black-box vulnerability research).
 
 So, why not combine the two? By reverse engineering things I've written in the past, I can hone my reverse engineering skills. At the same time, I hope it will improve my understanding of the artifacts I left behind in code that was trying to be stealthy. That's the idea, anyway.
 
@@ -143,7 +143,7 @@ With that last step, we have the final piece of the puzzle. We now know exactly 
 
 1. It scans memory starting from *DllCanUnloadNow()*, looking for the memory address of some function within AMSI.DLL.
 2. It places a hardware breakpoint on that function, ensuring it will trigger an exception every time it is reached.
-3. It registers a VEH to catch that breakpoint, then short-circuits the function to prevent it from firing.
+3. It registers a VEH to catch that breakpoint, which then short-circuits the function to prevent it from firing.
 
 The only thing we don't know is which exact function within AMSI.DLL is being patched. We could make some educated guesses based on common AMSI evasion techniques. We could use a debugger to figure out exactly where that breakpoint gets triggered. If we wanted, we could even load AMSI.DLL into Ghidra and perform a memory search ourselves, since we know the exact sequence of bytes that the DLL is searching for. I'll leave that as an exercise to the reader!
 
