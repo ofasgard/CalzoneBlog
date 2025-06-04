@@ -77,7 +77,7 @@ Since we've assessed that this symbol is where the AMSI bypass is likely to occu
 [![a screenshot of Ghidra centred on LAB_69801464 which we have renamed to exception_handler](/img/amsi-reveng-6.png)](/img/amsi-reveng-6.png)
 *(click the image if you can’t see it very well)*
 
-Since it's so well-annotated, this is actually pretty straightforward to analyse. First of all, we're checking for exception code *0x80000004*. If you're at all familiar with debugging, this should raise immediate alarm bells. It's the exception code for *EXCEPTION_SINGLE_STEP*, which immediately tells us that this VEH is expecting to be triggered by a breakpoint.
+Since it's so well-annotated, this is actually pretty straightforward to analyse. First of all, we're checking for exception code 0x80000004. This is the exception code for *EXCEPTION_SINGLE_STEP* as per [MSDN](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55), which immediately tells us that this VEH is expecting to be triggered by a breakpoint.
 
 We can also see another call to *FUN_698013f4*, which we saw previously in *DllMain()*. Here's what it looked like back then:
 
