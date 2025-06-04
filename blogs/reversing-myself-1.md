@@ -122,9 +122,9 @@ Most of the program is now fairly clear:
 - We also know, broadly, that the purpose of this DLL is to short-circuit the current function whenever it receives an *EXCEPTION_SINGLE_STEP*. 
 - We can guess, from context, that the function(s) it's meant to be short-circuiting are related to AMSI.
 
-We can assume that *FUN_69801627*, the setup function we identified earlier, is responsible for setting those breakpoints in the first place. But how exactly?
+We can assume that *FUN_69801627*, the setup function we identified earlier, is responsible for setting those breakpoints in the first place. But how, exactly? Let's start from the call to *memory_scanner()*. 
 
-Let's start from the call to *memory_scanner()*. Now that we know how it works, we can see that it starts from *DllCanUnloadNow()* and scans forward into the executable code of AMSI.DLL. It's searching for a specific sequence of bytes; we can now infer that those bytes correspond to the signature of the actual function it wants to patch. Let's rename variables accordingly to make that clear:
+Now that we know how it works, we can see that it starts from the address of *DllCanUnloadNow()* and scans forward into the executable code of AMSI.DLL. It's searching for a specific sequence of bytes; we can now infer that those bytes correspond to the signature of the actual function it wants to patch. Let's rename variables accordingly to make that clear:
 
 ![a screenshot of Ghidra showing a more throughly annotated DllMain](/img/amsi-reveng-9.png)
 
