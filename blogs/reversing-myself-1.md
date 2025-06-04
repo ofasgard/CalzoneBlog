@@ -52,15 +52,12 @@ We can assert with a fair amount of confidence that *DllMain* is the start of us
 Here's what we have to work with:
 
 [![a screenshot of Ghidra centred on DllMain](/img/amsi-reveng-4.png)](/img/amsi-reveng-4.png)
-
-<div style="align:center">*(click the image if you can’t see it very well)*</div>
+*(click the image if you can’t see it very well)*
 
 Reverse engineering often requires us to delve into the disassembly, but the decompiler output for this binary isn't actually bad. Ghidra has automatically identified the Windows API call invocations, so there are only a few user-defined functions we're not sure about the provenance of. We can make things even clearer by annotating the correct arguments and return value for *DllMain*:
 
-
 [![a screenshot of Ghidra centred on DllMain](/img/amsi-reveng-5.png)](/img/amsi-reveng-5.png)
-
-<div style="align:center">*(click the image if you can’t see it very well)*</div>
+*(click the image if you can’t see it very well)*
 
 We can already infer a few things that are happening here:
 
