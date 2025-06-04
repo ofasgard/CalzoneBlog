@@ -144,7 +144,8 @@ Thanks to helpful annotation of Windows APIs by Ghidra, we can get the gist of w
 
 It seems like *FUN_698014db* is where the actual breakpoint creation occurs - it gets passed a handle to every thread in the current process, along with the address of our target function. Let's take a look. I've already annotated the arguments, since we know what they are.
 
-![a screenshot of Ghidra showing FUN_698014db](/img/amsi-reveng-12.png)
+[![a screenshot of Ghidra showing FUN_698014db](/img/amsi-reveng-12.png)](/img/amsi-reveng-12.png)
+*(click the image if you can’t see it very well)*
 
 It might actually be hard to figure out what's happening here without delving into the disassembly, but Ghidra has come to our rescue once again. It has automatically identified the calls to *GetThreadContext()* and *SetThreadContext()* for us - two Windows APIs that can be used to manipulate the registers of a running thread.
 
