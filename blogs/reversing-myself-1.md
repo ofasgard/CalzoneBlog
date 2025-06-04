@@ -143,14 +143,13 @@ With that last step, we have the final piece of the puzzle. We now know exactly 
 
 1. It scans memory starting from `DllCanUnloadNow()`, looking for the memory address of some function within AMSI.DLL.
 2. It places a hardware breakpoint on that function, ensuring it will trigger an exception every time it is reached.
-3. It registers a Vectored Exception to catch that breakpoint, then short-circuits the function to prevent it from firing.
+3. It registers a Vectored Exception Handler to catch that breakpoint, then short-circuits the function to prevent it from firing.
 
-The only thing we don't know is which exact function within AMSI.DLL is being patched. We could make some educated guesses based on common AMSI evasion techniques. If we wanted, we could even load AMSI.DLL into Ghidra and perform a memory search ourselves, since we know the exact sequence of bytes that the DLL is searching for. I'll leave that as an exercise to the reader!
+The only thing we don't know is which exact function within AMSI.DLL is being patched. We could make some educated guesses based on common AMSI evasion techniques. We could use a debugger to figure out exactly where that breakpoint gets triggered. If we wanted, we could even load AMSI.DLL into Ghidra and perform a memory search ourselves, since we know the exact sequence of bytes that the DLL is searching for. I'll leave that as an exercise to the reader!
 
-Like I said at the beginning of the article, this was a warmup. With limited obfuscation and a fairly straightforward control flow, analysing this exploit was a breeze. I didn't need to do any dynamic analysis or reverse-engineer any deobfuscation routines, and I didn't need to dive into the disassembly at any point. Still, it was fun to take apart something I made!
+Like I said at the beginning of the article, this was a warmup. With limited obfuscation and a fairly straightforward control flow, analysing this binary was a breeze. I didn't need to do any dynamic analysis or reverse-engineer any deobfuscation routines, and I didn't need to dive into the disassembly at any point. Still, it was fun to take apart something I made!
 
-I'm planning for this to be the first in the series. I've written a  fair bit of "detection avoidant" software over the years - most as learning exercises, though some I've actually had the opportunity to deploy in red team engagements. I'm looking forward to sinking my teeth into something I actually designed to be stealthy!
-
+I'm planning for this to be the first in the series. I've written a fair bit of "detection avoidant" software over the years - mostly as learning exercises, though some I've actually had the opportunity to deploy in red team engagements. I'm looking forward to sinking my teeth into something I actually designed to be stealthy!
 
 <!--
 clickable image example:
