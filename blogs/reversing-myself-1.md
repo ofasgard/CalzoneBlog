@@ -1,9 +1,9 @@
 ---
-title: Reverse Engineering Myself, Part 1 (amsi-breakpoint.dll)
+title: Reverse Engineering Myself, Part 1: amsi-breakpoint.dll
 description: I return to one of my own projects to hone my malware RevEng skills.
 ---
 
-# Reverse Engineering Myself, Part 1 (amsi-breakpoint.dll)
+# Reverse Engineering Myself, Part 1: amsi-breakpoint.dll
 
 I recently completed FOR710, a SANS training course that dives deep into reverse engineering malware with Ghidra and various other tools. I found it hugely rewarding, but it was also clear to me that this is the kind of skill that gets rusty very quickly if you don't keep at it.
 
