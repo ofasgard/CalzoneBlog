@@ -167,4 +167,4 @@ The only thing we don't know is which exact function within AMSI.DLL is being pa
 
 With limited obfuscation and a fairly straightforward control flow, analysing this binary was a breeze. I didn't need to do any dynamic analysis or reverse-engineer any deobfuscation routines, and I didn't need to dive into the disassembly at any point. Still, it was fun to take apart something I made!
 
-I'm planning for this to be the first in the series. I've written a fair bit of "detection avoidant" software over the years - mostly as learning exercises, though some I've actually had the opportunity to deploy in red team engagements. I'm looking forward to sinking my teeth into something I actually designed to be stealthy!
+I'm planning for this to be the first in a series. I've written a fair bit of "detection avoidant" software over the years - mostly as learning exercises, though some I've actually had the opportunity to deploy in red team engagements. I'm looking forward to sinking my teeth into something I actually designed to be stealthy!
