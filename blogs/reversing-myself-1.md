@@ -64,7 +64,7 @@ We can already infer a few things that are happening here:
 2. We're getting the current pid, along with a handle to AMSI.DLL. We might therefore assume that some kind of process manipulation will take place.
 3. We're looking up the address of a specific symbol within AMSI, *DllCanUnloadNow()*. According to [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow), this is just a standard function that is exported by DLLs that are to be dynamically loaded.
 
-We can guess that the purpose of this DLL is to interfere with AMSI somehow. However, the exact mechanism is still unclear. We have three avenues to explore:
+We can guess that the purpose of this DLL is to interfere with AMSI somehow, probably for the current process. However, the exact mechanism is still unclear. We have three avenues to explore:
 
 - *LAB_69801464*: This is the pointer passed to *AddVectoredExceptionHandler()*, containing the function that'll be used to catch exceptions. It's very likely this is where the actual AMSI bypass will occur.
 - *FUN_698013f4*: This function is passed the address of *DllCanUnloadNow()*. It's also passed a pointer to a hardcoded string of bytes which we can't immediately identify. It's unclear what it does.
