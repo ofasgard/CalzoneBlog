@@ -75,6 +75,7 @@ We can guess that the purpose of this DLL is to interfere with AMSI somehow, pro
 Since we've assessed that this symbol is where the AMSI bypass is likely to occur, this is where we'll start. We already know it's a [VectoredHandler](https://learn.microsoft.com/en-us/windows/win32/api/winnt/nc-winnt-pvectored_exception_handler), so we can annotate the function with the correct arguments and parameters:
 
 ![a screenshot of Ghidra centred on LAB_69801464 which we have renamed to exception_handler](/img/amsi-reveng-6.png)
+*(click the image if you can’t see it very well)*
 
 Since it's so well-annotated, this is actually pretty straightforward to analyse. First of all, we're checking for exception code *0x80000004*. If you're at all familiar with debugging, this should raise immediate alarm bells. It's the exception code for *EXCEPTION_SINGLE_STEP*, which immediately tells us that this VEH is expecting to be triggered by a breakpoint.
 
