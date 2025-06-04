@@ -19,7 +19,7 @@ This should be very easy to reverse engineer, so let's consider this a bit of a 
 
 I applied only the most basic obfuscation before analysing `amsi-breakpoint.dll`: I compiled it with `gcc -s` to strip debugging symbols, and then ran `strip` on it for good measure. Then I loaded it into Ghidra and analysed it.
 
-Ghidra easily identified it as a binary that was compiled with GCC. Compiling a Windows binary with MingGW GCC is a little unusual compared to using native Microsoft toolchains, and might be an early red flag for a defender. There was also a single error about missing MinGW relocation tables, presumably because it's a stripped binary. Ghidra complained, but seemed to analyse it without issue.
+Ghidra easily identified it as a binary that was compiled with GCC. Compiling a Windows binary with MingGW GCC is a little unusual compared to using native Microsoft toolchains, and might be an early red flag for a malware analyst. There was also a single error about missing MinGW relocation tables, presumably because it's a stripped binary. Ghidra complained, but seemed to analyse it without issue.
 
 Interestingly, the binary still contains a bunch of named functions in the export directory even though I stripped it!
 
