@@ -5,7 +5,7 @@ description: I return to one of my own projects to hone my malware RevEng skills
 
 # Reverse Engineering Myself, Part 1 (amsi-breakpoint.dll)
 
-I recently completed FOR710, a SANS training course that dives deep into reverse engineering malware with Ghidra and various other tools. I found it hugely rewarding, but it was also clear to me that this is the kind of skill that gets rusty very quickly if you don't keep it.
+I recently completed FOR710, a SANS training course that dives deep into reverse engineering malware with Ghidra and various other tools. I found it hugely rewarding, but it was also clear to me that this is the kind of skill that gets rusty very quickly if you don't keep at it.
 
 Over the course of my career, I've written various pieces of software that might uncharitably be called malware. Part of the reason I took FOR710 in the first place was to understand what my malware looks like from the defensive perspective (I also thought it might help with black-box vulnerability research).
 
@@ -141,7 +141,7 @@ Thanks to that, we can see that values are being assigned to the Dr7 and Dr0 reg
 
 With that last step, we have the final piece of the puzzle. We now know exactly how this DLL works:
 
-1. It scans memory starting from `DllCanUnloadNow()`, looking for the memory address of some function within AMSI.DLL.
+1. It scans memory starting from *DllCanUnloadNow()*, looking for the memory address of some function within AMSI.DLL.
 2. It places a hardware breakpoint on that function, ensuring it will trigger an exception every time it is reached.
 3. It registers a Vectored Exception Handler to catch that breakpoint, then short-circuits the function to prevent it from firing.
 
