@@ -99,13 +99,58 @@ You pass it a memory address and a sequence of bytes. It returns a different mem
 
 ![a screenshot of Ghidra showing the annotated memory_scanner function](/img/amsi-reveng-7.png)
 
-Armed with this information, we can guess what this exception handler does. When it receives an *EXCEPTION_SINGLE_STEP*, it scans the current function for the next RET instruction. Then it redirects execution to that instruction, ensuring that the body of the function is never executed. It's a **patcher**.
+Armed with this information, we can guess what this exception handler does. When it receives an *EXCEPTION_SINGLE_STEP* event, it scans the current function for the next RET instruction. Then it redirects execution to that instruction, ensuring that the body of the function is never executed. It's a **patcher**.
 
 ## Analysing FUN_69801627
 
 Let's return to *DllMain()*. It looks a bit different now that we've introduced more context!
 
-![a screenshot of Ghidra showing the annotated memory_scanner function](/img/amsi-reveng-8.png)
+![a screenshot of Ghidra showing a more throughly annotated DllMain](/img/amsi-reveng-8.png)
+
+Most of the program is now fairly clear. We've already figured out that *FUN_698013f4* is a memory scanner and renamed it accordingly, so there's no need to spend any more time on it. We also know, broadly, that the purpose of this DLL is to short-circuit the current function whenever it receives an *EXCEPTION_SINGLE_STEP*. We can guess, from context, that the function(s) it's meant to be short-circuiting are related to AMSI.
+
+We can assume that *FUN_69801627*, the setup function we identified earlier, is responsible for setting those breakpoints in the first place. But how exactly?
+
+Let's start from the call to *memory_scanner()*. Now that we know how it works, we can see that it starts from *DllCanUnloadNow()* and scans forward into the executable code of AMSI.DLL. It's searching for a specific sequence of bytes; we can now infer that those bytes correspond to the signature of the actual function it wants to patch. Let's rename variables accordingly to make that clear:
+
+![a screenshot of Ghidra showing a more throughly annotated DllMain](/img/amsi-reveng-9.png)
+
+*FUN_69801627* is called with the PID of the current process and the address of the function we want to patch. It's also passed the 3rd and 4th arguments from *memory_scanner()*, which makes less sense, but let's take a deeper dive and see what we're working with.
+
+![a screenshot of Ghidra showing the decompiler for FUN_69801627](/img/amsi-reveng-10.png)
+
+Remember when I said I wasn't trying to be stealthy with this one? Thanks to a debug print statement left in the function, we can immediately see that we're on the right track. The purpose of this function is to hook a memory address. We can also see that Ghidra has gotten some of the auto-generated parameters wrong. We know these first two parameters should be a PID and a pointer, so let's fix that.
+
+![a screenshot of Ghidra showing the decompiler for FUN_69801627](/img/amsi-reveng-11.png)
+
+Thanks to helpful annotation of Windows APIs by Ghidra, we can get the gist of what's happening here. We can see calls to *CreateToolhelp32Snapshot()* and *Thread32First()*, a popular technique for enumerating threads within the current process. It seems like we're iterating over every thread, getting a handle to it with *OpenThread()*, and then invoking *FUN_698014db* on it.
+
+## Analysing FUN_698014db
+
+It seems like *FUN_698014db* is where the actual breakpoint creation occurs - it gets passed a handle to every thread in the current process, along with the address of our target function. Let's take a look. I've already annotated the arguments, since we know what they are.
+
+![a screenshot of Ghidra showing FUN_698014db](/img/amsi-reveng-12.png)
+
+It might actually be hard to figure out what's happening here without delving into the disassembly, but Ghidra has come to our rescue once again. It has automatically identified the calls to *GetThreadContext()* and *SetThreadContext()* for us - two Windows APIs that can be used to manipulate the registers of a running thread.
+
+Thanks to that, we can see that values are being assigned to the Dr7 and Dr0 registers... and that one of those values is the address of the function this DLL wants to patch. A quick google shows that these are debug registers used to set hardware breakpoints. The Dr0 register is used to hold the address of the breakpoint, and the Dr7 register holds various bitflags that are used to configure, enable and disable the various breakpoints.
+
+![a screenshot of Ghidra showing FUN_698014db with annotations](/img/amsi-reveng-13.png)
+
+## Conclusion
+
+With that last step, we have the final piece of the puzzle. We now know exactly how this DLL works:
+
+1. It scans memory starting from `DllCanUnloadNow()`, looking for the memory address of some function within AMSI.DLL.
+2. It places a hardware breakpoint on that function, ensuring it will trigger an exception every time it is reached.
+3. It registers a Vectored Exception to catch that breakpoint, then short-circuits the function to prevent it from firing.
+
+The only thing we don't know is which exact function within AMSI.DLL is being patched. We could make some educated guesses based on common AMSI evasion techniques. If we wanted, we could even load AMSI.DLL into Ghidra and perform a memory search ourselves, since we know the exact sequence of bytes that the DLL is searching for. I'll leave that as an exercise to the reader!
+
+Like I said at the beginning of the article, this was a warmup. With limited obfuscation and a fairly straightforward control flow, analysing this exploit was a breeze. I didn't need to do any dynamic analysis or reverse-engineer any deobfuscation routines, and I didn't need to dive into the disassembly at any point. Still, it was fun to take apart something I made!
+
+I'm planning for this to be the first in the series. I've written a  fair bit of "detection avoidant" software over the years - most as learning exercises, though some I've actually had the opportunity to deploy in red team engagements. I'm looking forward to sinking my teeth into something I actually designed to be stealthy!
+
 
 <!--
 clickable image example:
