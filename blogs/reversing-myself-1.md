@@ -111,9 +111,10 @@ Armed with this information, we can guess what this exception handler does. When
 
 ## Analysing FUN_69801627
 
-Let's return to *DllMain()*, which looks a bit different now that we've introduced more context!
+Let's return to *DllMain()*, which looks a bit different now that we've introduced more context.
 
-![a screenshot of Ghidra showing a more throughly annotated DllMain](/img/amsi-reveng-8.png)
+[![a screenshot of Ghidra showing a more throughly annotated DllMain](/img/amsi-reveng-8.png)](/img/amsi-reveng-8.png)
+*(click the image if you can’t see it very well)*
 
 Most of the program is now fairly clear. We've already figured out that *FUN_698013f4* is a memory scanner and renamed it accordingly, so there's no need to spend any more time on it. We also know, broadly, that the purpose of this DLL is to short-circuit the current function whenever it receives an *EXCEPTION_SINGLE_STEP*. We can guess, from context, that the function(s) it's meant to be short-circuiting are related to AMSI.
 
