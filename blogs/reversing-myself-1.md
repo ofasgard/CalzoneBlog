@@ -143,7 +143,7 @@ With that last step, we have the final piece of the puzzle. We now know exactly 
 
 1. It scans memory starting from *DllCanUnloadNow()*, looking for the memory address of some function within AMSI.DLL.
 2. It places a hardware breakpoint on that function, ensuring it will trigger an exception every time it is reached.
-3. It registers a Vectored Exception Handler to catch that breakpoint, then short-circuits the function to prevent it from firing.
+3. It registers a VEH to catch that breakpoint, then short-circuits the function to prevent it from firing.
 
 The only thing we don't know is which exact function within AMSI.DLL is being patched. We could make some educated guesses based on common AMSI evasion techniques. We could use a debugger to figure out exactly where that breakpoint gets triggered. If we wanted, we could even load AMSI.DLL into Ghidra and perform a memory search ourselves, since we know the exact sequence of bytes that the DLL is searching for. I'll leave that as an exercise to the reader!
 
