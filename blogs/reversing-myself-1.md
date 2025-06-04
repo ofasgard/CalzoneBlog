@@ -66,9 +66,9 @@ We can already infer a few things that are happening here:
 
 We can guess that the purpose of this DLL is to interfere with AMSI somehow, probably for the current process. However, the exact mechanism is still unclear. We have three avenues to explore:
 
-- *LAB_69801464*: This is the pointer passed to *AddVectoredExceptionHandler()*, containing the function that'll be used to catch exceptions. It's very likely this is where the actual AMSI bypass will occur.
-- *FUN_698013f4*: This function is passed the address of *DllCanUnloadNow()*. It's also passed a pointer to a hardcoded string of bytes which we can't immediately identify. It's unclear what it does.
-- *FUN_69801627*: This function only executes if *fdwReason* is 1, or "DLL_PROCESS_ATTACH". That is to say, it executes when the DLL is loaded. Therefore, it's probably responsible for performing some kind of setup.
+- **LAB_69801464**: This is the pointer passed to *AddVectoredExceptionHandler()*, containing the function that'll be used to catch exceptions. It's very likely this is where the actual AMSI bypass will occur.
+- **FUN_698013f4**: This function is passed the address of *DllCanUnloadNow()*. It's also passed a pointer to a hardcoded string of bytes which we can't immediately identify. It's unclear what it does.
+- **FUN_69801627**: This function only executes if *fdwReason* is 1, or "DLL_PROCESS_ATTACH". That is to say, it executes when the DLL is loaded. Therefore, it's probably responsible for performing some kind of setup.
 
 ## Analysing LAB_69801464
 
