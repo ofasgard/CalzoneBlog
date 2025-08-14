@@ -2,6 +2,7 @@
 title: Frida vs. AMSI - Beyond Prototyping
 description: We broke AMSI in theory, but now let's turn it into a real exploit!
 date: 2025-06-03
+permalink: /blogs/amsi-breakpoints
 ---
 
 # Frida vs. AMSI - Beyond Prototyping

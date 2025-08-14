@@ -2,6 +2,7 @@
 title: Reverse Engineering Myself, Part 1: amsi-breakpoint.dll
 description: I return to one of my own projects to hone my malware RevEng skills.
 date: 2025-06-04
+permalink: /blogs/reversing-myself-1
 ---
 
 # Reverse Engineering Myself, Part 1: amsi-breakpoint.dll
