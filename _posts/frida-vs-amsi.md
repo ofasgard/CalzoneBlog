@@ -1,6 +1,7 @@
 ---
 title: Frida vs. AMSI
 description: Let's use Frida to explore all the different ways we can patch or break the Anti-Malware Scan Interface.
+date: 2022-12-04
 ---
 
 # Frida vs. AMSI
