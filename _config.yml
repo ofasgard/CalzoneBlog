@@ -6,3 +6,4 @@ show_downloads: false
 plugins:
 - jekyll-remote-theme
 - jekyll-sitemap
+- jekyll-feed
