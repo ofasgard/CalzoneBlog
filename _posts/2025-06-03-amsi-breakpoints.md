@@ -7,7 +7,7 @@ permalink: /blogs/amsi-breakpoints
 
 # Frida vs. AMSI - Beyond Prototyping
 
-In my [previous article on bypassing AMSI](/_posts/frida-vs-amsi), I discussed various approaches to disabling AMSI on a Windows system - by hooking and intercepting key functions, by patching them in memory, or by corrupting the data structures that AMSI relies on to function. 
+In my [previous article on bypassing AMSI](/blogs/frida-vs-amsi), I discussed various approaches to disabling AMSI on a Windows system - by hooking and intercepting key functions, by patching them in memory, or by corrupting the data structures that AMSI relies on to function. 
 
 All of these techniques are certainly effective, and Frida was a great tool for rapidly implementing and experimenting with them.
 
@@ -178,7 +178,7 @@ Upon running `inject.exe` with the correct path and the PID of your Powershell p
 
 ![a screenshot that demonstrates the breakpoint AMSI bypass](/img/amsi-breakpoint.png)
 
-If you don't, then you might need to adjust the "egg" to match the function signature of *AmsiScanBuffer()* for your version of Windows. [The previous article](/_posts/frida-vs-amsi) describes how you can use Frida to easily extract those bytes.
+If you don't, then you might need to adjust the "egg" to match the function signature of *AmsiScanBuffer()* for your version of Windows. [The previous article](/blogs/frida-vs-amsi) describes how you can use Frida to easily extract those bytes.
 
 ## Conclusion
 

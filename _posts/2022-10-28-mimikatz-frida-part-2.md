@@ -7,7 +7,7 @@ permalink: /blogs/mimikatz-frida-part-2
 
 # Dumping Lsass with... Frida? (Part 2)
 
-[In the first chapter of this series](/_posts/mimikatz-frida-part-1), we stuck with Frida's core functionality - using its Interceptor module to hook and tamper with functions from *lsass.exe* and retrieve sensitive data passed to them. Our true goal, however, was to replicate the functionality of Mimikatz. To that end, let's have a look at how Mimikatz finds and decrypts credentials that have been cached in memory.
+[In the first chapter of this series](/blogs/mimikatz-frida-part-1), we stuck with Frida's core functionality - using its Interceptor module to hook and tamper with functions from *lsass.exe* and retrieve sensitive data passed to them. Our true goal, however, was to replicate the functionality of Mimikatz. To that end, let's have a look at how Mimikatz finds and decrypts credentials that have been cached in memory.
 
 I found the following blogs very useful when I was trying to figure all this out:
 
