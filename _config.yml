@@ -1,6 +1,7 @@
 theme: jekyll-theme-midnight
 title: Calzone Breaks Things
 description: Exploring memory, reverse engineering, and fuzzing.
+author: Callum Murphy-Hale
 show_downloads: false
 
 plugins:
