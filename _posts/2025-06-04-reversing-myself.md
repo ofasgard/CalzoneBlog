@@ -13,7 +13,7 @@ Over the course of my career, I've written various pieces of software that might
 
 So, why not combine the two? By reverse engineering things I've written in the past, I can hone my reverse engineering skills. At the same time, I hope it will improve my understanding of the artifacts I left behind in code that was trying to be stealthy. That's the idea, anyway.
 
-For this first article in the series, I'll be revisiting the AMSI breakpoint proof of concept I showcased in [Frida vs. AMSI - Beyond Prototyping](/_posts/amsi-breakpoints). I wrote that PoC to showcase a technique for evading EDR, but didn't make any attempts to obfuscate the code itself. You can refer to the previous article to see the source code of the original tool. I won't be referencing or reproducing it here, as the point is to infer what the DLL does **without** access to the original source code.
+For this first article in the series, I'll be revisiting the AMSI breakpoint proof of concept I showcased in [Frida vs. AMSI - Beyond Prototyping](/blogs/amsi-breakpoints). I wrote that PoC to showcase a technique for evading EDR, but didn't make any attempts to obfuscate the code itself. You can refer to the previous article to see the source code of the original tool. I won't be referencing or reproducing it here, as the point is to infer what the DLL does **without** access to the original source code.
 
 This should be very easy to reverse engineer, so let's consider this a bit of a warmup!
 
