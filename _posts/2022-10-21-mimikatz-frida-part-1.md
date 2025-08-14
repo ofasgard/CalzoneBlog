@@ -1,6 +1,6 @@
 ---
-title: Dumping Lsass with... Frida? (Part 1)
-description: A blog about dynamic instrumentation of Lsass for fun and profit!
+title: "Dumping Lsass with... Frida? (Part 1)"
+description: "A blog about dynamic instrumentation of Lsass for fun and profit!"
 date: 2022-10-21
 permalink: /blogs/mimikatz-frida-part-1
 ---
